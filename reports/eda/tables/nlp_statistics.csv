@@ -1,0 +1,46 @@
+,Value
+"('Token Count', 'Mean')",405.7352
+"('Token Count', 'Median')",384.0
+"('Token Count', 'Std')",211.10298264344823
+"('Token Count', 'Min')",20.0
+"('Token Count', 'Max')",3548.0
+"('Unique Words', 'Mean')",154.9342
+"('Unique Words', 'Median')",149.0
+"('Unique Words', 'Std')",64.65540557726013
+"('Unique Words', 'Min')",9.0
+"('Unique Words', 'Max')",952.0
+"('Vocabulary Richness', 'Mean')",0.4749490375372795
+"('Vocabulary Richness', 'Median')",0.4530818392541083
+"('Vocabulary Richness', 'Std')",0.1224653928545945
+"('Vocabulary Richness', 'Min')",0.1394700139470014
+"('Vocabulary Richness', 'Max')",1.0
+"('Type Token Ratio (TTR)', 'Mean')",0.4177558961159084
+"('Type Token Ratio (TTR)', 'Median')",0.4
+"('Type Token Ratio (TTR)', 'Std')",0.10273291691479773
+"('Type Token Ratio (TTR)', 'Min')",0.1310615989515072
+"('Type Token Ratio (TTR)', 'Max')",0.9545454545454546
+"('Average Sentence Length', 'Mean')",20.839763066295856
+"('Average Sentence Length', 'Median')",19.333333333333332
+"('Average Sentence Length', 'Std')",11.451095598457783
+"('Average Sentence Length', 'Min')",3.25
+"('Average Sentence Length', 'Max')",504.0
+"('Stopword Percentage', 'Mean')",0.47697197573362343
+"('Stopword Percentage', 'Median')",0.4824252532740302
+"('Stopword Percentage', 'Std')",0.0629028460976767
+"('Stopword Percentage', 'Min')",0.1885245901639344
+"('Stopword Percentage', 'Max')",0.6927710843373494
+"('Punctuation Percentage', 'Mean')",0.02195762366131715
+"('Punctuation Percentage', 'Median')",0.02043503195021463
+"('Punctuation Percentage', 'Std')",0.008225961588810964
+"('Punctuation Percentage', 'Min')",0.0
+"('Punctuation Percentage', 'Max')",0.09711286089238845
+"('Uppercase Ratio', 'Mean')",0.022742356498610894
+"('Uppercase Ratio', 'Median')",0.018691588785046728
+"('Uppercase Ratio', 'Std')",0.01881296685309037
+"('Uppercase Ratio', 'Min')",0.0
+"('Uppercase Ratio', 'Max')",0.7774416594641314
+"('Digit Ratio', 'Mean')",0.002157534854019429
+"('Digit Ratio', 'Median')",0.0
+"('Digit Ratio', 'Std')",0.0051621847970675944
+"('Digit Ratio', 'Min')",0.0
+"('Digit Ratio', 'Max')",0.17751479289940827

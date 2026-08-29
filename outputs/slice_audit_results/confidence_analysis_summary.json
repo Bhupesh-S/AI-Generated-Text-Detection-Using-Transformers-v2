@@ -1,0 +1,92 @@
+{
+  "RoBERTa V2.1": {
+    "Overall Mean Conf": 0.9111,
+    "Overall Median Conf": 0.9589,
+    "Overall Conf Range": [
+      0.6135,
+      0.9604
+    ],
+    "Correct AI Mean Conf": 0.9584,
+    "Incorrect AI (FN) Mean Conf": 0.7514,
+    "Correct Human Mean Conf": 0.885,
+    "Incorrect Human (FP) Mean Conf": 0.9198,
+    "Uncertain Predictions (<55%)": 0,
+    "High-Conf Wrong (>80%)": 19,
+    "High-Conf Wrong (>90%)": 14
+  },
+  "DeBERTa-v3-base V2.1": {
+    "Overall Mean Conf": 0.6905,
+    "Overall Median Conf": 0.7405,
+    "Overall Conf Range": [
+      0.5005,
+      0.8626
+    ],
+    "Correct AI Mean Conf": 0.5791,
+    "Incorrect AI (FN) Mean Conf": 0.6362,
+    "Correct Human Mean Conf": 0.7722,
+    "Incorrect Human (FP) Mean Conf": 0.5015,
+    "Uncertain Predictions (<55%)": 27,
+    "High-Conf Wrong (>80%)": 0,
+    "High-Conf Wrong (>90%)": 0
+  },
+  "DistilBERT V2.1": {
+    "Overall Mean Conf": 0.9533,
+    "Overall Median Conf": 0.9997,
+    "Overall Conf Range": [
+      0.5453,
+      1.0
+    ],
+    "Correct AI Mean Conf": 0.995,
+    "Incorrect AI (FN) Mean Conf": 0.7972,
+    "Correct Human Mean Conf": 0.9306,
+    "Incorrect Human (FP) Mean Conf": 0.9951,
+    "Uncertain Predictions (<55%)": 1,
+    "High-Conf Wrong (>80%)": 15,
+    "High-Conf Wrong (>90%)": 15
+  },
+  "XGBoost V2.1": {
+    "Overall Mean Conf": 0.8254,
+    "Overall Median Conf": 0.8737,
+    "Overall Conf Range": [
+      0.5013,
+      0.9981
+    ],
+    "Correct AI Mean Conf": 0.8645,
+    "Incorrect AI (FN) Mean Conf": 0.6572,
+    "Correct Human Mean Conf": 0.8464,
+    "Incorrect Human (FP) Mean Conf": 0.6161,
+    "Uncertain Predictions (<55%)": 22,
+    "High-Conf Wrong (>80%)": 5,
+    "High-Conf Wrong (>90%)": 0
+  },
+  "Weighted Soft Voting": {
+    "Overall Mean Conf": 0.8042,
+    "Overall Median Conf": 0.8204,
+    "Overall Conf Range": [
+      0.5234,
+      0.9362
+    ],
+    "Correct AI Mean Conf": 0.7979,
+    "Incorrect AI (FN) Mean Conf": 0.7224,
+    "Correct Human Mean Conf": 0.8296,
+    "Incorrect Human (FP) Mean Conf": 0.6491,
+    "Uncertain Predictions (<55%)": 3,
+    "High-Conf Wrong (>80%)": 1,
+    "High-Conf Wrong (>90%)": 0
+  },
+  "Stacking Ensemble V2.1": {
+    "Overall Mean Conf": 0.9037,
+    "Overall Median Conf": 0.9588,
+    "Overall Conf Range": [
+      0.503,
+      0.9969
+    ],
+    "Correct AI Mean Conf": 0.9585,
+    "Incorrect AI (FN) Mean Conf": 0.7252,
+    "Correct Human Mean Conf": 0.8883,
+    "Incorrect Human (FP) Mean Conf": 0.6815,
+    "Uncertain Predictions (<55%)": 13,
+    "High-Conf Wrong (>80%)": 7,
+    "High-Conf Wrong (>90%)": 2
+  }
+}

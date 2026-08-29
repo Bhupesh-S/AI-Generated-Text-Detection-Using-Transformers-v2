@@ -1,0 +1,9 @@
+,Value
+Number of Rows,552307
+Number of Columns,3
+Dataset Shape,"(552307, 3)"
+Column Names,"['text', 'label', 'source']"
+Data Types,"{'text': <StringDtype(storage='python', na_value=nan)>, 'label': dtype('int64'), 'source': <StringDtype(storage='python', na_value=nan)>}"
+Missing Values,"{'text': 0, 'label': 0, 'source': 0}"
+Duplicate Values,0
+Memory Usage (MB),1511.2061405181885

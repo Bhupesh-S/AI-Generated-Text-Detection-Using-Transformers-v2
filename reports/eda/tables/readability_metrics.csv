@@ -1,0 +1,31 @@
+,Value
+"('Flesch Reading Ease', 'Mean')",56.74360100312862
+"('Flesch Reading Ease', 'Median')",58.88177353410701
+"('Flesch Reading Ease', 'Std')",18.06604174914729
+"('Flesch Reading Ease', 'Min')",-418.5321428571428
+"('Flesch Reading Ease', 'Max')",112.57700000000003
+"('Flesch-Kincaid Grade', 'Mean')",10.490694086700879
+"('Flesch-Kincaid Grade', 'Median')",10.07077493379755
+"('Flesch-Kincaid Grade', 'Std')",4.4751535316333575
+"('Flesch-Kincaid Grade', 'Min')",-0.6542222222222218
+"('Flesch-Kincaid Grade', 'Max')",196.8438095238095
+"('Gunning Fog Index', 'Mean')",12.918489187021907
+"('Gunning Fog Index', 'Median')",12.364120813651645
+"('Gunning Fog Index', 'Std')",4.750289779026277
+"('Gunning Fog Index', 'Min')",2.7
+"('Gunning Fog Index', 'Max')",203.1873015873016
+"('SMOG Index', 'Mean')",12.109883352576878
+"('SMOG Index', 'Median')",11.899873341045819
+"('SMOG Index', 'Std')",2.5838534817312695
+"('SMOG Index', 'Min')",3.1291
+"('SMOG Index', 'Max')",32.258504731302004
+"('Automated Readability Index', 'Mean')",11.13129604472624
+"('Automated Readability Index', 'Median')",10.705548857647457
+"('Automated Readability Index', 'Std')",5.698095909706461
+"('Automated Readability Index', 'Min')",-5.575333333333335
+"('Automated Readability Index', 'Max')",250.79309523809525
+"('Coleman-Liau Index', 'Mean')",9.52846456568118
+"('Coleman-Liau Index', 'Median')",9.136672678346503
+"('Coleman-Liau Index', 'Std')",2.965021348944846
+"('Coleman-Liau Index', 'Min')",-2.5
+"('Coleman-Liau Index', 'Max')",36.537219730941715

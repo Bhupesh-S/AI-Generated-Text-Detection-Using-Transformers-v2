@@ -1,0 +1,15 @@
+{
+    "environment": {
+        "python_version": "3.12.5 (tags/v3.12.5:ff3bc82, Aug  6 2024, 20:45:27) [MSC v.1940 64 bit (AMD64)]",
+        "numpy_version": "1.26.4",
+        "pandas_version": "2.2.3",
+        "joblib_version": "1.4.2"
+    },
+    "seeds": {
+        "global_seed": 42,
+        "stratified_random_seed": 42
+    },
+    "dataset_hashes": {
+        "final_dataset.csv": "af0e4889478846fec552d2758e63552e4ae852f1c7dfd95c599f34f52fdf957d"
+    }
+}

@@ -1,0 +1,19 @@
+{
+    "total_test_samples": 4733,
+    "correct_predictions": 4494,
+    "incorrect_predictions": 239,
+    "accuracy": 0.9495034861609972,
+    "precision": 0.9732977303070761,
+    "recall": 0.9243448858833474,
+    "f1_score": 0.9481898981140255,
+    "roc_auc": 0.9933396686833365,
+    "pr_auc": 0.9936465943384488,
+    "human_fpr": 0.025348542458808618,
+    "ai_fnr": 0.07565511411665257,
+    "confusion_matrix": {
+        "tn": 2307,
+        "fp": 60,
+        "fn": 179,
+        "tp": 2187
+    }
+}

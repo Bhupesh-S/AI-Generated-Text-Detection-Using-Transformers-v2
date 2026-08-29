@@ -1,0 +1,19 @@
+\begin{table}
+\caption{Ablation study of Hybrid Ensemble components on hold-out academic test split.}
+\label{tab:ablation}
+\begin{tabular}{lrrrrrrrrrr}
+\toprule
+Configuration & Accuracy & Precision & Recall & F1 & ROC-AUC & MCC & Balanced Acc & FPR & FNR & Latency (ms) \\
+\midrule
+Full Hybrid Stacking Ensemble & 0.9250 & 1.0000 & 0.8333 & 0.9091 & 0.9962 & 0.8563 & 0.9167 & 0.0000 & 0.1667 & 321.0000 \\
+Without XGBoost (Transformer Only) & 0.9375 & 0.9429 & 0.9167 & 0.9296 & 0.9754 & 0.8737 & 0.9356 & 0.0455 & 0.0833 & 285.0000 \\
+Without RoBERTa Classifier & 0.9250 & 1.0000 & 0.8333 & 0.9091 & 0.9779 & 0.8563 & 0.9167 & 0.0000 & 0.1667 & 250.0000 \\
+Without DeBERTa Classifier & 0.9500 & 0.9444 & 0.9444 & 0.9444 & 0.9931 & 0.8990 & 0.9495 & 0.0455 & 0.0556 & 190.0000 \\
+Without DistilBERT Classifier & 0.9500 & 0.9444 & 0.9444 & 0.9444 & 0.9937 & 0.8990 & 0.9495 & 0.0455 & 0.0556 & 310.0000 \\
+Without Probability Calibration & 0.9500 & 0.9706 & 0.9167 & 0.9429 & 0.9931 & 0.8996 & 0.9470 & 0.0227 & 0.0833 & 321.0000 \\
+Without Out-of-Fold Stacking (Naive Fit) & 0.9625 & 0.9459 & 0.9722 & 0.9589 & 0.9962 & 0.9247 & 0.9634 & 0.0455 & 0.0278 & 321.0000 \\
+Without Advanced Meta Features & 0.9500 & 0.9444 & 0.9444 & 0.9444 & 0.9931 & 0.8990 & 0.9495 & 0.0455 & 0.0556 & 321.0000 \\
+Without Threshold Optimization (Fixed 0.5) & 0.9500 & 0.9211 & 0.9722 & 0.9459 & 0.9962 & 0.9006 & 0.9520 & 0.0682 & 0.0278 & 321.0000 \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,21 @@
+,Value
+"('Vocabulary Size', 'Mean')",154.926
+"('Vocabulary Size', 'Median')",149.0
+"('Vocabulary Size', 'Std')",64.64770470790127
+"('Vocabulary Size', 'Min')",9.0
+"('Vocabulary Size', 'Max')",952.0
+"('Unique Words', 'Mean')",154.926
+"('Unique Words', 'Median')",149.0
+"('Unique Words', 'Std')",64.64770470790127
+"('Unique Words', 'Min')",9.0
+"('Unique Words', 'Max')",952.0
+"('Type-Token Ratio (TTR)', 'Mean')",0.4749520192831087
+"('Type-Token Ratio (TTR)', 'Median')",0.45306303842472306
+"('Type-Token Ratio (TTR)', 'Std')",0.12246832176669918
+"('Type-Token Ratio (TTR)', 'Min')",0.1394700139470014
+"('Type-Token Ratio (TTR)', 'Max')",1.0
+"('Lexical Diversity', 'Mean')",8.195491123746258
+"('Lexical Diversity', 'Median')",8.105843618687693
+"('Lexical Diversity', 'Std')",1.6761251247923694
+"('Lexical Diversity', 'Min')",2.4053511772118195
+"('Lexical Diversity', 'Max')",17.392661466756497

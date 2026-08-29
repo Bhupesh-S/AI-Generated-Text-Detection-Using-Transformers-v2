@@ -1,0 +1,192 @@
+{
+  "main": {
+    "total": 47322,
+    "human": 23661,
+    "ai": 23661,
+    "human_pct": 50.0,
+    "ai_pct": 50.0,
+    "bucket_stats": [
+      {
+        "bucket": "20-39",
+        "total": 819,
+        "human": 404,
+        "ai": 415,
+        "human_pct": 49.32844932844933,
+        "ai_pct": 50.67155067155067
+      },
+      {
+        "bucket": "40-79",
+        "total": 1379,
+        "human": 641,
+        "ai": 738,
+        "human_pct": 46.48295866569978,
+        "ai_pct": 53.51704133430022
+      },
+      {
+        "bucket": "80-149",
+        "total": 2461,
+        "human": 629,
+        "ai": 1832,
+        "human_pct": 25.558715969118246,
+        "ai_pct": 74.44128403088176
+      },
+      {
+        "bucket": "150-299",
+        "total": 14112,
+        "human": 6516,
+        "ai": 7596,
+        "human_pct": 46.1734693877551,
+        "ai_pct": 53.826530612244895
+      },
+      {
+        "bucket": "300-499",
+        "total": 20439,
+        "human": 9258,
+        "ai": 11181,
+        "human_pct": 45.29575810949655,
+        "ai_pct": 54.70424189050345
+      },
+      {
+        "bucket": "500-999",
+        "total": 7809,
+        "human": 5929,
+        "ai": 1880,
+        "human_pct": 75.92521449609426,
+        "ai_pct": 24.074785503905748
+      },
+      {
+        "bucket": "1000-1999",
+        "total": 297,
+        "human": 279,
+        "ai": 18,
+        "human_pct": 93.93939393939394,
+        "ai_pct": 6.0606060606060606
+      },
+      {
+        "bucket": "2000+",
+        "total": 6,
+        "human": 5,
+        "ai": 1,
+        "human_pct": 83.33333333333334,
+        "ai_pct": 16.666666666666664
+      }
+    ],
+    "char_word_stats": {
+      "mean_words": 356.26484510375724,
+      "median_words": 338.0,
+      "std_words": 182.22647256547606,
+      "min_words": 20,
+      "max_words": 2783,
+      "mean_chars": 2069.188622627953,
+      "median_chars": 1964.0,
+      "over_512_tokens": 16760,
+      "over_1024_tokens": 1241,
+      "over_2048_tokens": 9
+    },
+    "quality_stats": {
+      "nulls": 0,
+      "empty": 0,
+      "whitespace_only": 0,
+      "short_under_20": 0,
+      "long_over_5000": 0,
+      "invalid_labels": 0,
+      "has_urls": 133,
+      "has_html": 35
+    }
+  },
+  "bak": {
+    "total": 55829,
+    "human": 32168,
+    "ai": 23661,
+    "human_pct": 57.6188002650952,
+    "ai_pct": 42.381199734904804,
+    "bucket_stats": [
+      {
+        "bucket": "20-39",
+        "total": 950,
+        "human": 535,
+        "ai": 415,
+        "human_pct": 56.315789473684205,
+        "ai_pct": 43.684210526315795
+      },
+      {
+        "bucket": "40-79",
+        "total": 1599,
+        "human": 861,
+        "ai": 738,
+        "human_pct": 53.84615384615385,
+        "ai_pct": 46.15384615384615
+      },
+      {
+        "bucket": "80-149",
+        "total": 2668,
+        "human": 836,
+        "ai": 1832,
+        "human_pct": 31.334332833583208,
+        "ai_pct": 68.66566716641678
+      },
+      {
+        "bucket": "150-299",
+        "total": 16528,
+        "human": 8932,
+        "ai": 7596,
+        "human_pct": 54.041626331074546,
+        "ai_pct": 45.95837366892546
+      },
+      {
+        "bucket": "300-499",
+        "total": 23738,
+        "human": 12557,
+        "ai": 11181,
+        "human_pct": 52.89830651276435,
+        "ai_pct": 47.10169348723566
+      },
+      {
+        "bucket": "500-999",
+        "total": 9946,
+        "human": 8066,
+        "ai": 1880,
+        "human_pct": 81.09792881560426,
+        "ai_pct": 18.902071184395737
+      },
+      {
+        "bucket": "1000-1999",
+        "total": 393,
+        "human": 375,
+        "ai": 18,
+        "human_pct": 95.41984732824427,
+        "ai_pct": 4.580152671755725
+      },
+      {
+        "bucket": "2000+",
+        "total": 7,
+        "human": 6,
+        "ai": 1,
+        "human_pct": 85.71428571428571,
+        "ai_pct": 14.285714285714285
+      }
+    ],
+    "char_word_stats": {
+      "mean_words": 362.43353812534707,
+      "median_words": 342.0,
+      "std_words": 186.53591150823988,
+      "min_words": 20,
+      "max_words": 2836,
+      "mean_chars": 2089.1079188235503,
+      "median_chars": 1973.0,
+      "over_512_tokens": 20584,
+      "over_1024_tokens": 1626,
+      "over_2048_tokens": 12
+    },
+    "quality_stats": {
+      "nulls": 0,
+      "empty": 0,
+      "whitespace_only": 0,
+      "short_under_20": 0,
+      "long_over_5000": 0,
+      "invalid_labels": 0,
+      "has_urls": 155,
+      "has_html": 36
+    }
+  }
+}

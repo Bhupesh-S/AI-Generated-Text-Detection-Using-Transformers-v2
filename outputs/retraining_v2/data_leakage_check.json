@@ -1,0 +1,12 @@
+{
+    "total_samples": 55829,
+    "ai_samples": 23661,
+    "human_samples": 32168,
+    "train_samples": 44663,
+    "val_samples": 5583,
+    "test_samples": 5583,
+    "train_val_overlap": 0,
+    "train_test_overlap": 0,
+    "val_test_overlap": 0,
+    "verified_no_leakage": true
+}

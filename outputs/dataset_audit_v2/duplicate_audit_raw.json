@@ -1,0 +1,206 @@
+{
+  "main": {
+    "total_rows": 47322,
+    "exact_full_duplicates": 0,
+    "exact_text_duplicates": 0,
+    "normalized_text_duplicates": 5,
+    "cross_label_normalized_conflicts": 0,
+    "sample_size_tested": 5000,
+    "near_duplicate_pairs_in_sample": 99,
+    "extrapolated_near_duplicate_pairs": 8867,
+    "sample_near_dup_examples": [
+      {
+        "idx_a": 2,
+        "idx_b": 1598,
+        "sim": 0.9815,
+        "label_a": 1,
+        "label_b": 1,
+        "text_a_snippet": "Exploring Venus: Worth Pursuit or Dangerous Idea? Author \"The Challenge of Exploring Venus\" argues t",
+        "text_b_snippet": "Exploring Venus: Worthy Pursuit or Dangerous Idea? Author \"The Challenge of Exploring Venus\" argues "
+      },
+      {
+        "idx_a": 24,
+        "idx_b": 3432,
+        "sim": 0.9595,
+        "label_a": 0,
+        "label_b": 0,
+        "text_a_snippet": "Most people might not know what Seagoing Cowboys are, but that doesn't mean that you hate it just be",
+        "text_b_snippet": "Most people might not Now what Seagoing Cowboys are, but that doesn't mean that you hate it must bec"
+      },
+      {
+        "idx_a": 38,
+        "idx_b": 2153,
+        "sim": 0.955,
+        "label_a": 1,
+        "label_b": 1,
+        "text_a_snippet": "When people ask for advice, they sometimes talk to more than one person. This can IE a helpful strat",
+        "text_b_snippet": "When people ask for advice, they sometimes talk to more than one person. This can be a helpful strat"
+      },
+      {
+        "idx_a": 47,
+        "idx_b": 2746,
+        "sim": 0.9388,
+        "label_a": 1,
+        "label_b": 1,
+        "text_a_snippet": "In today'L highly competitive job market, a degree certificate Hal become a crucial factor in determ",
+        "text_b_snippet": "In today's highly competitive job market, a degree certificate has become an equal factor in determi"
+      },
+      {
+        "idx_a": 108,
+        "idx_b": 2757,
+        "sim": 0.9132,
+        "label_a": 0,
+        "label_b": 0,
+        "text_a_snippet": "Many of us are used to getting somewhere by simply using a car, but should we always use a car. If w",
+        "text_b_snippet": "Many of us are used to getting somewher by simply using a car, but should we always use a car. If we"
+      },
+      {
+        "idx_a": 140,
+        "idx_b": 4470,
+        "sim": 0.9578,
+        "label_a": 0,
+        "label_b": 0,
+        "text_a_snippet": "The electoral college is a very controversial topic.\u00a0 It has been debated by important figures like ",
+        "text_b_snippet": "The electoral college is a very controversial topic. It has been debated by important figures like R"
+      },
+      {
+        "idx_a": 145,
+        "idx_b": 571,
+        "sim": 0.8844,
+        "label_a": 1,
+        "label_b": 1,
+        "text_a_snippet": "The issue of gun control has been a highly contentious one in many countries, particularly in the Un",
+        "text_b_snippet": "Gun control is a highly controversial issue that has sparked intense debates in many countries. Whil"
+      },
+      {
+        "idx_a": 169,
+        "idx_b": 4005,
+        "sim": 0.9566,
+        "label_a": 1,
+        "label_b": 1,
+        "text_a_snippet": "The use of Facial Action Coding System (FACS) technology to read emotions in the classroom is valuab",
+        "text_b_snippet": "The use of Facial Action Coding System (FACS) technology to read emotions in the classroom is valuab"
+      },
+      {
+        "idx_a": 176,
+        "idx_b": 2001,
+        "sim": 0.9722,
+        "label_a": 1,
+        "label_b": 1,
+        "text_a_snippet": "Okay, here's my attempt at writing an essay on the benefits of working in a team: Working in a team ",
+        "text_b_snippet": "Okay, here's my attempt at writing an essay on the benefits on working in a team: Working in a team "
+      },
+      {
+        "idx_a": 245,
+        "idx_b": 1585,
+        "sim": 0.9766,
+        "label_a": 1,
+        "label_b": 1,
+        "text_a_snippet": "Curfews have been a topic of debate for many years. Some people believe that curfews are necessary t",
+        "text_b_snippet": "Curfews have been a topic of debate for many years. Some people believe that curfews are necessary t"
+      }
+    ]
+  },
+  "bak": {
+    "total_rows": 55829,
+    "exact_full_duplicates": 0,
+    "exact_text_duplicates": 0,
+    "normalized_text_duplicates": 10,
+    "cross_label_normalized_conflicts": 0,
+    "sample_size_tested": 5000,
+    "near_duplicate_pairs_in_sample": 126,
+    "extrapolated_near_duplicate_pairs": 15709,
+    "sample_near_dup_examples": [
+      {
+        "idx_a": 3,
+        "idx_b": 848,
+        "sim": 0.8846,
+        "label_a": 1,
+        "label_b": 1,
+        "text_a_snippet": "When it come to knowledge, many people believe that it IG better to Specialize in one Specific Subje",
+        "text_b_snippet": "When it comes to knowledge, many people believe that it is better to specialize in one specific subj"
+      },
+      {
+        "idx_a": 9,
+        "idx_b": 4615,
+        "sim": 0.9986,
+        "label_a": 0,
+        "label_b": 0,
+        "text_a_snippet": "Who would one blame if they lost a loved one in a driverless car accident? The driver or the company",
+        "text_b_snippet": "Who would one blame if they lost a loved one in a driverless car accident? The driver or the company"
+      },
+      {
+        "idx_a": 24,
+        "idx_b": 91,
+        "sim": 0.9611,
+        "label_a": 0,
+        "label_b": 0,
+        "text_a_snippet": "In the article \"Making Mona Lisa Smile\", the author is describing a new technology, one that enables",
+        "text_b_snippet": "In the article \"Making Mona Lisa Smile\", the author is describing a new technology, one that enables"
+      },
+      {
+        "idx_a": 24,
+        "idx_b": 2284,
+        "sim": 0.9589,
+        "label_a": 0,
+        "label_b": 0,
+        "text_a_snippet": "In the article \"Making Mona Lisa Smile\", the author is describing a new technology, one that enables",
+        "text_b_snippet": "In the article \"Making Mona Lisa Smile\", the author is describing a new technology, one that enables"
+      },
+      {
+        "idx_a": 53,
+        "idx_b": 3215,
+        "sim": 0.9689,
+        "label_a": 0,
+        "label_b": 0,
+        "text_a_snippet": "\"All of our development since World War II has been centered around the car, and that will have to c",
+        "text_b_snippet": "\"All of our development since World War II has been centered around the car, and that will have to c"
+      },
+      {
+        "idx_a": 77,
+        "idx_b": 4328,
+        "sim": 0.9693,
+        "label_a": 0,
+        "label_b": 0,
+        "text_a_snippet": "Would you want to keep the Electoral College or change the election by popular vote for the Presiden",
+        "text_b_snippet": "Would you east to keep the Electoral College or change the election by popular vote for the Presiden"
+      },
+      {
+        "idx_a": 91,
+        "idx_b": 2284,
+        "sim": 0.9927,
+        "label_a": 0,
+        "label_b": 0,
+        "text_a_snippet": "In the article \"Making Mona Lisa Smile\", the author is describing a new technology, one that enables",
+        "text_b_snippet": "In the article \"Making Mona Lisa Smile\", the author is describing a new technology, one that enables"
+      },
+      {
+        "idx_a": 118,
+        "idx_b": 1697,
+        "sim": 0.9846,
+        "label_a": 0,
+        "label_b": 0,
+        "text_a_snippet": "During the summer many learning institutions enforce mandatory summer projects over the break to ass",
+        "text_b_snippet": "During the summer many learning institutions enforce mandatory summer projects over the break to ass"
+      },
+      {
+        "idx_a": 124,
+        "idx_b": 3301,
+        "sim": 0.9721,
+        "label_a": 0,
+        "label_b": 0,
+        "text_a_snippet": "Using technology to read's student's emotional expressions is a good way of being able to detect exa",
+        "text_b_snippet": "Using technology to read's student's emotional expressions is a good way of being able to detect exa"
+      },
+      {
+        "idx_a": 187,
+        "idx_b": 2353,
+        "sim": 0.9199,
+        "label_a": 0,
+        "label_b": 0,
+        "text_a_snippet": "Venus is a worthy pursuit despite the dangers because NASA would ft to find out about ARH twin plant",
+        "text_b_snippet": "Venue is a worthy pursuit despite the dangers because NASA would get to find out about are twin plan"
+      }
+    ]
+  }
+}

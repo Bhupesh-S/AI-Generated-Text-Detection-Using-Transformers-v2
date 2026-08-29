@@ -1,0 +1,14 @@
+\begin{table}
+\caption{Paired McNemar statistical significance testing compared against base models.}
+\label{tab:significance}
+\begin{tabular}{lrrlll}
+\toprule
+Model Comparison & McNemar Chi2 & McNemar p-value & Significant (alpha=0.05) & Base F1 95% CI & Ensemble F1 95% CI \\
+\midrule
+Ensemble vs RoBERTa-base & 0.0500 & 0.8231 & No & [0.8646, 0.9851] & [0.8363, 0.9706] \\
+Ensemble vs DeBERTa-v3-base & 29.0083 & 0.0000 & Yes & [0.0000, 0.0000] & [0.8363, 0.9706] \\
+Ensemble vs DistilBERT-base & 26.0093 & 0.0000 & Yes & [0.0000, 0.3182] & [0.8363, 0.9706] \\
+Ensemble vs XGBoost & 0.0500 & 0.8231 & No & [0.8274, 0.9589] & [0.8363, 0.9706] \\
+\bottomrule
+\end{tabular}
+\end{table}

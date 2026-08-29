@@ -1,0 +1,4 @@
+Model,Accuracy,Precision,Recall,F1-score,ROC-AUC,Training Time,Inference Time,Number of Parameters,Model Size
+RoBERTa-base,0.947877,0.961316,0.913779,0.936945,0.99257,25:37:06,46.03 s,"124,647,170",476 MB
+DeBERTa-v3-base,0.576214,0.0,0.0,0.0,0.5,14:23:30,106.87 s,"184,422,914",704 MB
+DistilBERT-base-uncased,0.6,0.0,0.0,0.0,1.0,0:00:04,0.12 s,"66,362,882",253 MB

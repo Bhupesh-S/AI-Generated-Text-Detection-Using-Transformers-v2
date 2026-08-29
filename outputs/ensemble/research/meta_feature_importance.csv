@@ -1,0 +1,19 @@
+Feature,Importance (F1 Drop)
+agreement_count,0.36363636363636365
+xgboost_prob,0.030303030303030276
+confidence_spread,0.016783216783216703
+ttr,0.016783216783216703
+prob_mean,0.016783216783216703
+avg_sentence_len,0.016783216783216703
+prob_max,0.016783216783216703
+prob_min,0.016783216783216703
+entropy,0.016783216783216703
+roberta_prob,0.0
+sentence_count,0.0
+doc_length,0.0
+prob_variance,0.0
+deberta_prob,0.0
+prob_range,0.0
+prob_std,0.0
+distilbert_prob,0.0
+burstiness,0.0

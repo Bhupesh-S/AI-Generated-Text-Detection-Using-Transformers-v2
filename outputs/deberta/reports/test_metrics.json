@@ -1,0 +1,9 @@
+{
+    "test_accuracy": 0.576214,
+    "test_precision": 0.0,
+    "test_recall": 0.0,
+    "test_f1": 0.0,
+    "test_roc_auc": 0.5,
+    "inference_time_sec": 106.873,
+    "samples_per_sec": 52.2
+}

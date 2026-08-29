@@ -1,0 +1,29 @@
+,Value
+"('Text Length', 'Mean')",2080.8585007975635
+"('Text Length', 'Median')",1964.0
+"('Text Length', 'Std')",1105.801122636651
+"('Text Length', 'Min')",43.0
+"('Text Length', 'Max')",47550.0
+"('Text Length', '25th Percentile')",1341.0
+"('Text Length', '50th Percentile')",1964.0
+"('Text Length', '75th Percentile')",2622.0
+"('Text Length', '90th Percentile')",3480.0
+"('Text Length', '95th Percentile')",4145.0
+"('Word Count', 'Mean')",361.1772257096144
+"('Word Count', 'Median')",340.0
+"('Word Count', 'Std')",186.8938606747967
+"('Word Count', 'Min')",20.0
+"('Word Count', 'Max')",7215.0
+"('Word Count', '25th Percentile')",239.0
+"('Word Count', '50th Percentile')",340.0
+"('Word Count', '75th Percentile')",452.0
+"('Word Count', '90th Percentile')",597.0
+"('Word Count', '95th Percentile')",705.0
+"('Sentence Count', 'Mean')",18.491302844251475
+"('Sentence Count', 'Median')",18.0
+"('Sentence Count', 'Std')",9.899171840878454
+"('Sentence Count', 'Min')",1.0
+"('Sentence Count', 'Max')",355.0
+"('Average Word Length', 'Mean')",4.7155385809183485
+"('Average Word Length', 'Median')",4.655629139072848
+"('Average Word Length', 'Std')",0.5485394802761494

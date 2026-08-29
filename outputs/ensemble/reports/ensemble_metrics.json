@@ -1,0 +1,345 @@
+{
+    "RoBERTa-base": {
+        "accuracy": 0.94,
+        "balanced_accuracy": 0.936688,
+        "precision": 0.952381,
+        "recall": 0.909091,
+        "f1": 0.930233,
+        "roc_auc": 0.99026,
+        "mcc": 0.878382,
+        "confusion_matrix": [
+            [
+                27,
+                1
+            ],
+            [
+                2,
+                20
+            ]
+        ],
+        "classification_report": {
+            "Human Written": {
+                "precision": 0.9310344827586207,
+                "recall": 0.9642857142857143,
+                "f1-score": 0.9473684210526315,
+                "support": 28.0
+            },
+            "AI Generated": {
+                "precision": 0.9523809523809523,
+                "recall": 0.9090909090909091,
+                "f1-score": 0.9302325581395349,
+                "support": 22.0
+            },
+            "accuracy": 0.94,
+            "macro avg": {
+                "precision": 0.9417077175697866,
+                "recall": 0.9366883116883117,
+                "f1-score": 0.9388004895960832,
+                "support": 50.0
+            },
+            "weighted avg": {
+                "precision": 0.9404269293924465,
+                "recall": 0.94,
+                "f1-score": 0.939828641370869,
+                "support": 50.0
+            }
+        },
+        "classification_report_str": "               precision    recall  f1-score   support\n\nHuman Written       0.93      0.96      0.95        28\n AI Generated       0.95      0.91      0.93        22\n\n     accuracy                           0.94        50\n    macro avg       0.94      0.94      0.94        50\n weighted avg       0.94      0.94      0.94        50\n",
+        "training_time": 92226.0,
+        "inference_time": 46.03
+    },
+    "DeBERTa-v3-base": {
+        "accuracy": 0.56,
+        "balanced_accuracy": 0.5,
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "roc_auc": 0.493506,
+        "mcc": 0.0,
+        "confusion_matrix": [
+            [
+                28,
+                0
+            ],
+            [
+                22,
+                0
+            ]
+        ],
+        "classification_report": {
+            "Human Written": {
+                "precision": 0.56,
+                "recall": 1.0,
+                "f1-score": 0.717948717948718,
+                "support": 28.0
+            },
+            "AI Generated": {
+                "precision": 0.0,
+                "recall": 0.0,
+                "f1-score": 0.0,
+                "support": 22.0
+            },
+            "accuracy": 0.56,
+            "macro avg": {
+                "precision": 0.28,
+                "recall": 0.5,
+                "f1-score": 0.358974358974359,
+                "support": 50.0
+            },
+            "weighted avg": {
+                "precision": 0.31360000000000005,
+                "recall": 0.56,
+                "f1-score": 0.40205128205128204,
+                "support": 50.0
+            }
+        },
+        "classification_report_str": "               precision    recall  f1-score   support\n\nHuman Written       0.56      1.00      0.72        28\n AI Generated       0.00      0.00      0.00        22\n\n     accuracy                           0.56        50\n    macro avg       0.28      0.50      0.36        50\n weighted avg       0.31      0.56      0.40        50\n",
+        "training_time": 51810.0,
+        "inference_time": 106.87
+    },
+    "DistilBERT-base-uncased": {
+        "accuracy": 0.6,
+        "balanced_accuracy": 0.545455,
+        "precision": 1.0,
+        "recall": 0.090909,
+        "f1": 0.166667,
+        "roc_auc": 0.869318,
+        "mcc": 0.230283,
+        "confusion_matrix": [
+            [
+                28,
+                0
+            ],
+            [
+                20,
+                2
+            ]
+        ],
+        "classification_report": {
+            "Human Written": {
+                "precision": 0.5833333333333334,
+                "recall": 1.0,
+                "f1-score": 0.7368421052631579,
+                "support": 28.0
+            },
+            "AI Generated": {
+                "precision": 1.0,
+                "recall": 0.09090909090909091,
+                "f1-score": 0.16666666666666666,
+                "support": 22.0
+            },
+            "accuracy": 0.6,
+            "macro avg": {
+                "precision": 0.7916666666666667,
+                "recall": 0.5454545454545454,
+                "f1-score": 0.45175438596491224,
+                "support": 50.0
+            },
+            "weighted avg": {
+                "precision": 0.7666666666666667,
+                "recall": 0.6,
+                "f1-score": 0.48596491228070177,
+                "support": 50.0
+            }
+        },
+        "classification_report_str": "               precision    recall  f1-score   support\n\nHuman Written       0.58      1.00      0.74        28\n AI Generated       1.00      0.09      0.17        22\n\n     accuracy                           0.60        50\n    macro avg       0.79      0.55      0.45        50\n weighted avg       0.77      0.60      0.49        50\n",
+        "training_time": 64800.0,
+        "inference_time": 35.0
+    },
+    "XGBoost": {
+        "accuracy": 0.94,
+        "balanced_accuracy": 0.931818,
+        "precision": 1.0,
+        "recall": 0.863636,
+        "f1": 0.926829,
+        "roc_auc": 0.98539,
+        "mcc": 0.883209,
+        "confusion_matrix": [
+            [
+                28,
+                0
+            ],
+            [
+                3,
+                19
+            ]
+        ],
+        "classification_report": {
+            "Human Written": {
+                "precision": 0.9032258064516129,
+                "recall": 1.0,
+                "f1-score": 0.9491525423728814,
+                "support": 28.0
+            },
+            "AI Generated": {
+                "precision": 1.0,
+                "recall": 0.8636363636363636,
+                "f1-score": 0.926829268292683,
+                "support": 22.0
+            },
+            "accuracy": 0.94,
+            "macro avg": {
+                "precision": 0.9516129032258065,
+                "recall": 0.9318181818181819,
+                "f1-score": 0.9379909053327822,
+                "support": 50.0
+            },
+            "weighted avg": {
+                "precision": 0.9458064516129032,
+                "recall": 0.94,
+                "f1-score": 0.939330301777594,
+                "support": 50.0
+            }
+        },
+        "classification_report_str": "               precision    recall  f1-score   support\n\nHuman Written       0.90      1.00      0.95        28\n AI Generated       1.00      0.86      0.93        22\n\n     accuracy                           0.94        50\n    macro avg       0.95      0.93      0.94        50\n weighted avg       0.95      0.94      0.94        50\n",
+        "training_time": 15.0,
+        "inference_time": 2.5
+    },
+    "Soft Voting": {
+        "accuracy": 0.94,
+        "balanced_accuracy": 0.936688,
+        "precision": 0.952381,
+        "recall": 0.909091,
+        "f1": 0.930233,
+        "roc_auc": 0.99513,
+        "mcc": 0.878382,
+        "confusion_matrix": [
+            [
+                27,
+                1
+            ],
+            [
+                2,
+                20
+            ]
+        ],
+        "classification_report": {
+            "Human Written": {
+                "precision": 0.9310344827586207,
+                "recall": 0.9642857142857143,
+                "f1-score": 0.9473684210526315,
+                "support": 28.0
+            },
+            "AI Generated": {
+                "precision": 0.9523809523809523,
+                "recall": 0.9090909090909091,
+                "f1-score": 0.9302325581395349,
+                "support": 22.0
+            },
+            "accuracy": 0.94,
+            "macro avg": {
+                "precision": 0.9417077175697866,
+                "recall": 0.9366883116883117,
+                "f1-score": 0.9388004895960832,
+                "support": 50.0
+            },
+            "weighted avg": {
+                "precision": 0.9404269293924465,
+                "recall": 0.94,
+                "f1-score": 0.939828641370869,
+                "support": 50.0
+            }
+        },
+        "classification_report_str": "               precision    recall  f1-score   support\n\nHuman Written       0.93      0.96      0.95        28\n AI Generated       0.95      0.91      0.93        22\n\n     accuracy                           0.94        50\n    macro avg       0.94      0.94      0.94        50\n weighted avg       0.94      0.94      0.94        50\n",
+        "training_time": 0.1,
+        "inference_time": 0.1
+    },
+    "Weighted Voting": {
+        "accuracy": 0.94,
+        "balanced_accuracy": 0.936688,
+        "precision": 0.952381,
+        "recall": 0.909091,
+        "f1": 0.930233,
+        "roc_auc": 0.99513,
+        "mcc": 0.878382,
+        "confusion_matrix": [
+            [
+                27,
+                1
+            ],
+            [
+                2,
+                20
+            ]
+        ],
+        "classification_report": {
+            "Human Written": {
+                "precision": 0.9310344827586207,
+                "recall": 0.9642857142857143,
+                "f1-score": 0.9473684210526315,
+                "support": 28.0
+            },
+            "AI Generated": {
+                "precision": 0.9523809523809523,
+                "recall": 0.9090909090909091,
+                "f1-score": 0.9302325581395349,
+                "support": 22.0
+            },
+            "accuracy": 0.94,
+            "macro avg": {
+                "precision": 0.9417077175697866,
+                "recall": 0.9366883116883117,
+                "f1-score": 0.9388004895960832,
+                "support": 50.0
+            },
+            "weighted avg": {
+                "precision": 0.9404269293924465,
+                "recall": 0.94,
+                "f1-score": 0.939828641370869,
+                "support": 50.0
+            }
+        },
+        "classification_report_str": "               precision    recall  f1-score   support\n\nHuman Written       0.93      0.96      0.95        28\n AI Generated       0.95      0.91      0.93        22\n\n     accuracy                           0.94        50\n    macro avg       0.94      0.94      0.94        50\n weighted avg       0.94      0.94      0.94        50\n",
+        "training_time": 0.1,
+        "inference_time": 0.1
+    },
+    "Stacking": {
+        "accuracy": 0.92,
+        "balanced_accuracy": 0.909091,
+        "precision": 1.0,
+        "recall": 0.818182,
+        "f1": 0.9,
+        "roc_auc": 0.99513,
+        "mcc": 0.846114,
+        "confusion_matrix": [
+            [
+                28,
+                0
+            ],
+            [
+                4,
+                18
+            ]
+        ],
+        "classification_report": {
+            "Human Written": {
+                "precision": 0.875,
+                "recall": 1.0,
+                "f1-score": 0.9333333333333333,
+                "support": 28.0
+            },
+            "AI Generated": {
+                "precision": 1.0,
+                "recall": 0.8181818181818182,
+                "f1-score": 0.9,
+                "support": 22.0
+            },
+            "accuracy": 0.92,
+            "macro avg": {
+                "precision": 0.9375,
+                "recall": 0.9090909090909092,
+                "f1-score": 0.9166666666666667,
+                "support": 50.0
+            },
+            "weighted avg": {
+                "precision": 0.93,
+                "recall": 0.92,
+                "f1-score": 0.9186666666666667,
+                "support": 50.0
+            }
+        },
+        "classification_report_str": "               precision    recall  f1-score   support\n\nHuman Written       0.88      1.00      0.93        28\n AI Generated       1.00      0.82      0.90        22\n\n     accuracy                           0.92        50\n    macro avg       0.94      0.91      0.92        50\n weighted avg       0.93      0.92      0.92        50\n",
+        "training_time": 1.0,
+        "inference_time": 0.15
+    }
+}

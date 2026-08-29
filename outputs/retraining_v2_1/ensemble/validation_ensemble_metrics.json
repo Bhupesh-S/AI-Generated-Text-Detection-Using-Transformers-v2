@@ -1,0 +1,50 @@
+{
+  "deberta": {
+    "Accuracy": 0.89,
+    "Precision": 1.0,
+    "Recall": 0.78,
+    "F1": 0.8764044943820225,
+    "ROC-AUC": 0.95,
+    "LogLoss": 0.4489230710906589
+  },
+  "distilbert": {
+    "Accuracy": 0.92,
+    "Precision": 1.0,
+    "Recall": 0.84,
+    "F1": 0.9130434782608695,
+    "ROC-AUC": 0.9576,
+    "LogLoss": 0.3028775610782644
+  },
+  "roberta": {
+    "Accuracy": 0.91,
+    "Precision": 0.9767441860465116,
+    "Recall": 0.84,
+    "F1": 0.9032258064516129,
+    "ROC-AUC": 0.9600000000000001,
+    "LogLoss": 0.24098639907282024
+  },
+  "xgboost": {
+    "Accuracy": 0.83,
+    "Precision": 0.8113207547169812,
+    "Recall": 0.86,
+    "F1": 0.8349514563106796,
+    "ROC-AUC": 0.8932,
+    "LogLoss": 0.4114254361876064
+  },
+  "Weighted Soft Voting": {
+    "Accuracy": 0.92,
+    "Precision": 1.0,
+    "Recall": 0.84,
+    "F1": 0.9130434782608695,
+    "ROC-AUC": 0.96,
+    "LogLoss": 0.2906243982640339
+  },
+  "Stacking Ensemble (V2.1)": {
+    "Accuracy": 0.91,
+    "Precision": 0.9767441860465116,
+    "Recall": 0.84,
+    "F1": 0.9032258064516129,
+    "ROC-AUC": 0.9792000000000001,
+    "LogLoss": 0.17623263604673792
+  }
+}

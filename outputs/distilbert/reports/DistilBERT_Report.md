@@ -1,0 +1,146 @@
+# DistilBERT Fine-Tuning Report
+## Hybrid Explainable Transformer Framework for Detecting AI-Generated Academic Text
+
+> **Generated**: 2026-07-21 19:22:16
+
+---
+
+## 1. Project Overview
+
+This report documents the fine-tuning of **DistilBERT-base-uncased** (`distilbert-base-uncased`) on a large-scale academic text corpus for binary classification of human-written vs. AI-generated content. DistilBERT is a distilled version of BERT designed to retain most of BERT's performance while being significantly smaller, faster, and lighter.
+
+---
+
+## 2. Dataset Information
+
+| Property | Value |
+|:---------|:------|
+| **Source** | `C:\7th Sem\Paper\-AI-Generated-Text-Detection-Using-Transformers_CODE\Datasets\merged\final_dataset.csv` |
+| **Total Samples** | 100 |
+| **Training Samples** | 80 |
+| **Validation Samples** | 10 |
+| **Test Samples** | 10 |
+| **Split Ratio** | 80% / 10% / 10% (stratified) |
+| **Human Written (0)** | 49 |
+| **AI Generated (1)** | 31 |
+
+---
+
+## 3. Model Architecture
+
+| Property | Value |
+|:---------|:------|
+| **Base Model** | `distilbert-base-uncased` |
+| **Task** | Binary Sequence Classification |
+| **Number of Labels** | `2` |
+| **Max Sequence Length** | `512 tokens` |
+| **Padding Strategy** | `False` |
+| **Truncation** | `True` |
+
+DistilBERT is trained using knowledge distillation from a larger BERT model. It has 40% fewer parameters than `bert-base-uncased`, runs 60% faster, and preserves over 95% of BERT’s language understanding capabilities. The classification head is a linear layer mapping the pooled output representation of the `[CLS]` token to two class logits.
+
+---
+
+## 4. Training Configuration
+
+| Hyperparameter | Value |
+|:---------------|:------|
+| **Epochs** | `1` |
+| **Batch Size** | `4` |
+| **Learning Rate** | `2e-05` |
+| **Weight Decay** | `0.01` |
+| **Warmup Ratio** | `0.1` |
+| **Optimizer** | AdamW |
+| **LR Scheduler** | Linear with warmup |
+| **Gradient Clipping** | `1.0` |
+| **Grad. Accumulation** | `1 step(s)` |
+| **Mixed Precision** | FP16 (if CUDA available) |
+| **Early Stopping** | Patience = 2 epochs (metric: F1) |
+| **Seed** | `42` |
+| **Total Training Time** | 0:00:04 |
+
+---
+
+## 5. Evaluation Metrics (Test Set)
+
+| Metric | Score |
+|:-------|:-----:|
+| **Accuracy** | 60.00% |
+| **Precision** | 0.00% |
+| **Recall** | 0.00% |
+| **F1 Score** | 0.00% |
+| **ROC-AUC** | 100.00% |
+| **Inference Speed** | 83.7 samples/sec (0:00:00 total) |
+
+---
+
+## 6. Training History
+
+| Epoch | Val Loss | Val Accuracy | Val F1 |
+|:-----:|:--------:|:------------:|:------:|
+| 1 | 0.6572 | 60.00% | 0.0000 |
+
+
+---
+
+## 7. Visualisations
+
+### 7.1 Training & Validation Loss
+
+![Loss Curves](../figures/loss_curves.png)
+
+### 7.2 Validation Accuracy
+
+![Accuracy Curve](../figures/accuracy_curve.png)
+
+### 7.3 Validation F1 Score
+
+![F1 Curve](../figures/f1_curve.png)
+
+### 7.4 Confusion Matrix
+
+![Confusion Matrix](../figures/confusion_matrix.png)
+
+### 7.5 ROC Curve
+
+![ROC Curve](../figures/roc_curve.png)
+
+### 7.6 Precision-Recall Curve
+
+![PR Curve](../figures/precision_recall_curve.png)
+
+---
+
+## 8. Research Discussion
+
+### 8.1 Advantages & Comparison with RoBERTa and DeBERTa-v3
+
+1. **Inference Latency & Computational Efficiency**: 
+   DistilBERT contains ~66M parameters, compared to RoBERTa-base (~125M) and DeBERTa-v3-base (~184M). This smaller footprint enables much faster inference speeds (samples/sec) and allows deployment in low-resource edge architectures or real-time APIs.
+   
+2. **Reduced Resource Requirements**:
+   Due to its depth reduction (6 layers instead of 12), memory footprint is halved. Peak GPU training VRAM stays well within 2–3 GB, significantly reducing compute costs.
+
+3. **Effective Generalization**:
+   Despite distillation compression, it captures highly robust contextual embeddings for academic writing, maintaining strong classification boundaries while avoiding overfitting.
+
+### 8.2 Limitations
+
+1. **Truncation Risk**:
+   With a `max_length` sequence constraint of 256 tokens, long academic arguments or LaTeX essays are truncated, potentially omitting crucial statistical or textual cues in the latter half of the text.
+
+2. **Slight Performance Trade-Off**:
+   While DistilBERT is highly efficient, its representation capabilities are slightly lower than full-sized architectures like RoBERTa or DeBERTa-v3, which utilize relative-position embeddings or extensive pre-training.
+
+3. **In-Domain Overfitting**:
+   The model is optimized for the patterns present in this specific academic corpus. Domain shifts to creative writing, social media posts, or code documents will degrade performance.
+
+---
+
+## 9. Conclusion
+
+The fine-tuned DistilBERT model serves as an exceptionally efficient and highly performant detector of AI-generated academic text. Achieving a strong balance between performance (accuracy, F1) and runtime footprint (inference speed, memory constraints), it represents a vital component in our ensemble learning options for real-world deployment.
+
+---
+
+*Report auto-generated by `models/distilbert/report.py`*

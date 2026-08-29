@@ -1,0 +1,10 @@
+{
+  "total_full_dataset": 117872,
+  "exact_duplicates_full": 0,
+  "normalized_duplicates_full": 0,
+  "train_test_overlap_count": 0,
+  "val_test_overlap_count": 0,
+  "train_val_overlap_count": 0,
+  "train_test_overlap_pct_of_test": 0.0,
+  "val_test_overlap_pct_of_test": 0.0
+}
