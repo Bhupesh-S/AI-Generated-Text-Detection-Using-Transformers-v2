@@ -1,0 +1,46 @@
+{
+    "model_name": "Hybrid Stacking Ensemble Meta-Classifier",
+    "decision_threshold": 0.73,
+    "test_set_metrics": {
+        "total_samples": 5583,
+        "human_samples": 3217,
+        "ai_samples": 2366,
+        "correct_predictions": 5315,
+        "incorrect_predictions": 268,
+        "accuracy": 0.9519971341572632,
+        "precision": 0.9658081705150977,
+        "recall": 0.9192730346576501,
+        "f1_score": 0.9419662191424859,
+        "roc_auc": 0.9924660595615379,
+        "pr_auc": 0.990662144898729,
+        "human_false_positive_rate": 0.02393534348772148,
+        "ai_false_negative_rate": 0.08072696534234995,
+        "confusion_matrix": {
+            "tn": 3140,
+            "fp": 77,
+            "fn": 191,
+            "tp": 2175
+        }
+    },
+    "validation_set_metrics": {
+        "total_samples": 5583,
+        "human_samples": 3217,
+        "ai_samples": 2366,
+        "correct_predictions": 5304,
+        "incorrect_predictions": 279,
+        "accuracy": 0.9500268672756582,
+        "precision": 0.963983992885727,
+        "recall": 0.9163144547759933,
+        "f1_score": 0.9395449620801734,
+        "roc_auc": 0.9923878875721253,
+        "pr_auc": 0.9903035727347996,
+        "human_false_positive_rate": 0.0251787379546161,
+        "ai_false_negative_rate": 0.08368554522400676,
+        "confusion_matrix": {
+            "tn": 3136,
+            "fp": 81,
+            "fn": 198,
+            "tp": 2168
+        }
+    }
+}
