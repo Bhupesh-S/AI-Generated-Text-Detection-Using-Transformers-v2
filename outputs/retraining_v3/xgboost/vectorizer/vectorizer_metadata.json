@@ -1,0 +1,17 @@
+{
+  "tier_name": "Tier 1 (Memory-Safe V3 Primary - 30k Features)",
+  "max_features": 30000,
+  "ngram_range": [
+    1,
+    2
+  ],
+  "min_df": 5,
+  "max_df": 0.95,
+  "sublinear_tf": true,
+  "stop_words": null,
+  "dtype": "float32",
+  "vocabulary_size": 30000,
+  "fitted_rows": 374580,
+  "fitted_at": "2026-09-23T08:25:04.996775",
+  "configuration_note": "TF-IDF feature representation set to 30,000 features for Tesla T4 GPU memory safety; identical V3 dataset splits and evaluation protocol preserved."
+}
