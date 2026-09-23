@@ -14,17 +14,29 @@ BASE_DIR = pathlib.Path(__file__).parent.resolve()
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-# Import Hybrid Pipeline
+# Import Hybrid Pipeline & Explainability Engine
 try:
+    import importlib
+    import models.ensemble.config
+    import models.ensemble.predict
+    importlib.reload(models.ensemble.config)
+    importlib.reload(models.ensemble.predict)
     from models.ensemble.predict import HybridInferencePipeline
     HYBRID_AVAILABLE = True
 except Exception as e:
     HYBRID_AVAILABLE = False
     HYBRID_ERROR = str(e)
 
+try:
+    from explainability import ExplainabilityEngine, load_text_from_input, generate_dynamic_decision_explanation
+    XAI_AVAILABLE = True
+except Exception as e:
+    XAI_AVAILABLE = False
+    XAI_ERROR = str(e)
+
 # Set Streamlit page config
 st.set_page_config(
-    page_title="Hybrid AI Text Detector | Dashboard",
+    page_title="Hybrid AI Text Detector & XAI Dashboard",
     page_icon=":material/security:",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -70,7 +82,6 @@ def _inject_css():
     padding-top: 1.2rem !important;
     padding-bottom: 1.5rem !important;
 }}
-/* Style the built-in expander to blend with sidebar */
 [data-testid="stSidebar"] [data-testid="stExpander"] {{
     background: #0f172a !important;
     border: 1px solid {input_br} !important;
@@ -151,7 +162,6 @@ def _inject_css():
     border-radius: 12px;
     padding: 1.1rem 1.3rem;
     margin-bottom: 1rem;
-    /* elevated shadow */
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.3),
                 0 10px 24px -4px rgba(0,0,0,0.35);
     transition: box-shadow 0.2s ease;
@@ -159,14 +169,6 @@ def _inject_css():
 .card-panel:hover {{
     box-shadow: 0 6px 12px -2px rgba(0,0,0,0.4),
                 0 16px 32px -6px rgba(0,0,0,0.45);
-}}
-.card-title {{
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: {text_card};
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin-bottom: 0.85rem;
 }}
 
 /* ── 6. Textarea & focus glow ────────────────────────── */
@@ -373,7 +375,12 @@ _inject_css()
 # Paths & Cached Models
 # ----------------------------------------------------
 
-TFIDF_PATH = BASE_DIR / "outputs" / "tfidf" / "tfidf_vectorizer.pkl"
+V3_ROOT = BASE_DIR / "outputs" / "retraining_v3"
+DEBERTA_PATH = V3_ROOT / "deberta" / "final"
+DISTILBERT_PATH = V3_ROOT / "distilbert" / "final"
+ROBERTA_PATH = V3_ROOT / "roberta" / "final"
+XGBOOST_PATH = V3_ROOT / "xgboost" / "final" / "xgboost_model.joblib"
+TFIDF_PATH = V3_ROOT / "xgboost" / "vectorizer" / "tfidf_vectorizer.joblib"
 MODELS_DIR = BASE_DIR / "outputs" / "models"
 MIN_WORDS = 200
 
@@ -382,9 +389,43 @@ MIN_WORDS = 200
 def get_hybrid_pipeline():
     if HYBRID_AVAILABLE:
         try:
+            import importlib
+            import models.ensemble.config
+            import models.ensemble.predict
+            importlib.reload(models.ensemble.config)
+            importlib.reload(models.ensemble.predict)
+            from models.ensemble.config import CFG
+            from models.ensemble.predict import HybridInferencePipeline
+            CFG.deberta_path = DEBERTA_PATH
+            CFG.distilbert_path = DISTILBERT_PATH
+            CFG.roberta_path = ROBERTA_PATH
+            CFG.xgboost_path = XGBOOST_PATH
+            CFG.vectorizer_path = TFIDF_PATH
             return HybridInferencePipeline()
         except Exception as e:
             st.error(f"Error initializing Hybrid Inference Pipeline: {e}")
+            return None
+    return None
+
+# Cache Explainability Engine
+@st.cache_resource(show_spinner="Loading Explainable AI Subsystems (SHAP, LIME, Attention)...")
+def get_xai_engine():
+    pipeline = get_hybrid_pipeline()
+    if pipeline is not None and XAI_AVAILABLE:
+        try:
+            import importlib
+            import explainability.shap_explainer
+            import explainability.lime_explainer
+            import explainability.attention_explainer
+            import explainability.explainability
+            importlib.reload(explainability.shap_explainer)
+            importlib.reload(explainability.lime_explainer)
+            importlib.reload(explainability.attention_explainer)
+            importlib.reload(explainability.explainability)
+            from explainability import ExplainabilityEngine
+            return ExplainabilityEngine(pipeline=pipeline)
+        except Exception as e:
+            st.error(f"Error initializing Explainability Engine: {e}")
             return None
     return None
 
@@ -408,7 +449,10 @@ def load_baseline_models():
         "XGBoost": "xgboost.joblib"
     }
     for name, filename in model_files.items():
-        path = MODELS_DIR / filename
+        if name == "XGBoost" and XGBOOST_PATH.exists():
+            path = XGBOOST_PATH
+        else:
+            path = MODELS_DIR / filename
         if path.exists():
             try:
                 models[name] = joblib.load(path)
@@ -417,10 +461,7 @@ def load_baseline_models():
     return models
 
 def count_words(text: str) -> int:
-    """
-    Consistently count words in text.
-    Handles spaces, multiple spaces, newlines, tabs, and punctuation naturally.
-    """
+    """Consistently count words in text."""
     if not text or not text.strip():
         return 0
     return len(text.strip().split())
@@ -458,6 +499,12 @@ def compute_text_metrics(text: str):
 
 # Load cached resources
 hybrid_pipeline = get_hybrid_pipeline()
+xai_engine = get_xai_engine()
+if xai_engine is not None and hybrid_pipeline is not None:
+    if hasattr(xai_engine, "set_pipeline"):
+        xai_engine.set_pipeline(hybrid_pipeline)
+    else:
+        xai_engine.pipeline = hybrid_pipeline
 vectorizer = load_tfidf_vectorizer()
 baseline_models = load_baseline_models()
 
@@ -466,10 +513,10 @@ st.markdown("""
 <div class="dash-header">
     <div>
         <div class="dash-title">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px; vertical-align:-3px;"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/></svg>Hybrid AI Text Detector
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#818cf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px; vertical-align:-3px;"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/></svg>Hybrid AI Text Detector & XAI Dashboard
         </div>
-        <div class="dash-subtitle">Advanced Multi-Model AI Detection & Stylometric Analysis System</div>
-        <div class="dash-tags">RoBERTa &bull; DeBERTa &bull; DistilBERT &bull; XGBoost &bull; Stacking Meta-Classifier</div>
+        <div class="dash-subtitle">Advanced Multi-Model AI Detection & Explainable AI Framework (SHAP, LIME, Attention)</div>
+        <div class="dash-tags">RoBERTa &bull; DeBERTa &bull; DistilBERT &bull; XGBoost &bull; Stacking Meta-Classifier &bull; XAI Engine</div>
     </div>
     <div>
         <span class="status-pill status-online">
@@ -479,49 +526,37 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# Fixed Authoritative Engine Identifier
+selected_engine = "Hybrid Stacking Meta-Classifier (Recommended)"
+
 # Compact Sidebar Configuration
 with st.sidebar:
-    st.markdown("### Detection Engine")
-
-    model_options = []
-    if hybrid_pipeline is not None:
-        model_options.append("Hybrid Stacking Meta-Classifier (Recommended)")
-        model_options.append("Hybrid Weighted Ensemble")
-        model_options.append("RoBERTa-base (Transformer)")
-        model_options.append("DeBERTa-v3 (Transformer)")
-        model_options.append("DistilBERT (Transformer)")
-
-    for name in baseline_models.keys():
-        model_options.append(f"{name} (TF-IDF)")
-
-    if not model_options:
-        model_options = ["Heuristic Analyzer"]
-
-    selected_engine = st.selectbox(
-        "Select Engine",
-        options=model_options,
-        index=0,
-        help="Choose the model or ensemble architecture to evaluate text."
-    )
-
-    # Architecture Status & Diagnostic Model Signature
+    # Architecture Status & Signature
     with st.expander("Architecture Status & Signature", expanded=True):
         if hybrid_pipeline is not None:
-            sig = getattr(hybrid_pipeline, "get_runtime_signature", lambda: {})()
+            device_str = str(hybrid_pipeline.device).upper()
             st.markdown(f"""
-            <div class="sb-item"><span class="sb-active">● Hybrid Pipeline Active</span></div>
-            <div class="sb-item"><span>Device:</span> <code>{hybrid_pipeline.device}</code></div>
-            <div class="sb-item"><span>RoBERTa V2.1:</span> <code style="font-size:0.68rem;">{sig.get('roberta_path', 'Active')}</code></div>
-            <div class="sb-item"><span>DeBERTa V2.1:</span> <code style="font-size:0.68rem;">{sig.get('deberta_path', 'Active')}</code></div>
-            <div class="sb-item"><span>DistilBERT V2.1:</span> <code style="font-size:0.68rem;">{sig.get('distilbert_path', 'Active')}</code></div>
-            <div class="sb-item"><span>XGBoost:</span> <code style="font-size:0.68rem;">{sig.get('xgboost_path', 'Active')}</code></div>
-            <div class="sb-item"><span>Meta-Classifier:</span> <code style="font-size:0.68rem;">{sig.get('meta_classifier_path', 'Active')}</code></div>
+            <div style="margin-bottom: 8px;">
+                <div class="sb-item"><span class="sb-active" style="font-size:0.78rem;">● Hybrid Pipeline Active</span></div>
+            </div>
+            <div class="sb-item"><span>Device</span> <code style="font-size:0.72rem; color:#f1f5f9; background:#1e293b; padding:1px 6px; border-radius:4px; font-weight:600;">{device_str}</code></div>
+            <div style="height: 6px;"></div>
+            <div class="sb-item"><span>RoBERTa V2.1</span> <span class="sb-active">✓ Loaded</span></div>
+            <div class="sb-item"><span>DeBERTa V2.1</span> <span class="sb-active">✓ Loaded</span></div>
+            <div class="sb-item"><span>DistilBERT V2.1</span> <span class="sb-active">✓ Loaded</span></div>
+            <div class="sb-item"><span>XGBoost</span> <span class="sb-active">✓ Loaded</span></div>
+            <div style="height: 6px;"></div>
+            <div class="sb-item"><span>Stacking Meta-Classifier</span> <span class="sb-active">✓ Active</span></div>
             """, unsafe_allow_html=True)
         else:
-            st.markdown("""<div class="sb-item"><span style="color:#f43f5e;">Hybrid Pipeline Offline</span></div>""", unsafe_allow_html=True)
+            st.markdown("""<div class="sb-item"><span style="color:#f43f5e; font-weight:700;">● Hybrid Pipeline Offline</span></div>""", unsafe_allow_html=True)
+
+        xai_lbl = '<span class="sb-active">✓ Active</span>' if xai_engine else '<span style="color:#94a3b8;">Offline</span>'
+        tfidf_status = '<span class="sb-active">✓ Active</span>' if vectorizer else '<span style="color:#94a3b8;">Offline</span>'
         st.markdown(f"""
-            <div class="sb-item"><span>TF-IDF Vectorizer</span> <span>{'Active' if vectorizer else 'Offline'}</span></div>
-            <div class="sb-item"><span>Baseline Models</span> <span>{len(baseline_models)} loaded</span></div>
+            <div class="sb-item"><span>Unified XAI Engine</span> {xai_lbl}</div>
+            <div class="sb-item"><span>TF-IDF Vectorizer</span> {tfidf_status}</div>
+            <div class="sb-item"><span>Baseline Models</span> <span style="color:#f1f5f9; font-weight:600;">{len(baseline_models)} loaded</span></div>
         """, unsafe_allow_html=True)
 
 # Main Dashboard Grid
@@ -531,7 +566,7 @@ with col_left:
     st.markdown("""
     <div class="card-header-box">
         <div class="card-header-title">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px; vertical-align:-1px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>TEXT ANALYSIS
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px; vertical-align:-1px;"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>TEXT INPUT FOR AI DETECTION
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -541,7 +576,7 @@ with col_left:
 
     input_text = st.text_area(
         label="Paste academic text, essay, or generated content below:",
-        height=270,
+        height=250,
         placeholder=f"Paste text here to inspect for AI generation (minimum {MIN_WORDS} words required)...",
         key="main_text_input"
     )
@@ -569,18 +604,21 @@ with col_left:
         clear_clicked = st.button("Clear Text", icon=":material/delete_outline:", use_container_width=True)
         if clear_clicked:
             st.session_state["main_text_input"] = ""
+            if "uploaded_extracted_text" in st.session_state:
+                del st.session_state["uploaded_extracted_text"]
             if "last_analyzed_text" in st.session_state:
                 del st.session_state["last_analyzed_text"]
             if "last_selected_engine" in st.session_state:
                 del st.session_state["last_selected_engine"]
             if "last_analysis_results" in st.session_state:
                 del st.session_state["last_analysis_results"]
+            if "xai_result_cache" in st.session_state:
+                del st.session_state["xai_result_cache"]
             st.rerun()
 
     if analyze_clicked and not is_valid_input:
         st.warning(f"Please enter at least {MIN_WORDS} words for reliable detection.", icon=":material/warning:")
 
-    # Execute inference immediately if requested
     should_run_inference = analyze_clicked and is_valid_input
 
     if should_run_inference:
@@ -589,18 +627,30 @@ with col_left:
             ai_prob = 0.5
             hybrid_res = None
             model_breakdown = {}
+            strategy_lbl = selected_engine
 
-            # Execute Backend Hybrid Pipeline
+            if hybrid_pipeline is None and HYBRID_AVAILABLE:
+                hybrid_pipeline = get_hybrid_pipeline()
+
             if hybrid_pipeline is not None and ("Hybrid" in selected_engine or "RoBERTa" in selected_engine or "DeBERTa" in selected_engine or "DistilBERT" in selected_engine):
-                hybrid_res = hybrid_pipeline.predict(input_text)
+                try:
+                    if not hasattr(hybrid_pipeline, "_get_vectorizer_xgboost"):
+                        st.cache_resource.clear()
+                        hybrid_pipeline = get_hybrid_pipeline()
+                    hybrid_res = hybrid_pipeline.predict(input_text)
+                except Exception as pred_err:
+                    if "Feature shape mismatch" in str(pred_err) or "vectorizer" in str(pred_err).lower():
+                        st.cache_resource.clear()
+                        hybrid_pipeline = get_hybrid_pipeline()
+                        hybrid_res = hybrid_pipeline.predict(input_text)
+                    else:
+                        raise pred_err
 
-                # Auto-clear Streamlit cache if pipeline instance in memory is from an older version
                 if not isinstance(hybrid_res, dict) or "model_breakdown" not in hybrid_res or "ai_probability" not in hybrid_res:
                     st.cache_resource.clear()
                     hybrid_pipeline = get_hybrid_pipeline()
                     hybrid_res = hybrid_pipeline.predict(input_text)
 
-                # Extract model breakdown mapping safely
                 if "model_breakdown" in hybrid_res:
                     mb = hybrid_res["model_breakdown"]
                     r_ai = float(mb.get("roberta", mb.get("RoBERTa-base", {})).get("ai_probability", 0.5))
@@ -654,6 +704,8 @@ with col_left:
                         score = float(m.decision_function(vec)[0])
                         ai_prob = 1.0 / (1.0 + math.exp(-score))
                     strategy_lbl = f"{clean_engine_name} (TF-IDF)"
+                else:
+                    strategy_lbl = f"{selected_engine}"
 
                 for bname, bm in baseline_models.items():
                     try:
@@ -670,7 +722,6 @@ with col_left:
             elapsed_ms = elapsed_sec * 1000.0
             pred_time_str = format_prediction_time(elapsed_sec)
 
-            # Cache results in session state
             st.session_state.last_analyzed_text = input_text
             st.session_state.last_selected_engine = selected_engine
             st.session_state.last_analysis_results = {
@@ -686,14 +737,12 @@ with col_left:
             }
             current_matches_last = True
 
-    # Extract canonical prediction time display for rendering both panels
     if current_matches_last and "last_analysis_results" in st.session_state:
         res_data = st.session_state.last_analysis_results
         pred_time_display = res_data.get("pred_time_str", format_prediction_time(res_data.get("elapsed_sec")))
     else:
         pred_time_display = "—"
 
-    # Render Live Word Counter & Stats Bar
     if is_valid_input:
         wc_html = f'<span style="color: #10b981; font-weight: 800;">Word count: {word_count} / {MIN_WORDS}</span>'
         bar_border = "1px solid rgba(16, 185, 129, 0.3)"
@@ -716,7 +765,6 @@ with col_left:
 # Right Column: Detection Results & Analytics
 with col_right:
     if current_matches_last and "last_analysis_results" in st.session_state:
-        # Retrieve cached results
         res = st.session_state.last_analysis_results
         ai_prob = res["ai_prob"]
         human_prob = res.get("human_prob", 1.0 - ai_prob)
@@ -730,7 +778,6 @@ with col_right:
         else:
             is_ai = (ai_prob >= 0.50)
 
-        # Render Primary Prediction Summary Card
         banner_class = "banner-ai" if is_ai else "banner-human"
         badge_class = "res-badge-ai" if is_ai else "res-badge-human"
         badge_text = "AI-GENERATED" if is_ai else "HUMAN-WRITTEN"
@@ -772,7 +819,6 @@ with col_right:
         </div>
         """, unsafe_allow_html=True)
 
-        # Breakdown & Consensus Side-by-Side
         sub_col1, sub_col2 = st.columns([1.1, 0.9])
 
         with sub_col1:
@@ -917,22 +963,398 @@ with col_right:
                 <div style="font-size: 0.85rem; color: #94a3b8; max-width: 380px; margin: 0 auto;">Current input contains <b>{word_count}</b> / {MIN_WORDS} words. Please enter at least {MIN_WORDS} words to enable AI detection.</div>
             </div>
             """, unsafe_allow_html=True)
+
+
+# ── EXPLAINABLE AI (XAI) DASHBOARD SECTION ─────────────────────────────────────
+if current_matches_last and "last_analysis_results" in st.session_state:
+    st.markdown("<hr style='border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 2rem 0 1.5rem;'>", unsafe_allow_html=True)
+    
+    # Check if cached XAI output exists for this input text
+    has_cached_xai = (
+        "xai_result_cache" in st.session_state and
+        st.session_state.get("xai_cache_text") == input_text
+    )
+
+    # 1. Automatic Full XAI Generation if not already cached
+    if not has_cached_xai:
+        if xai_engine is None:
+            st.error("Unified Explainability Engine is offline or could not be loaded.")
         else:
-            st.markdown(f"""
-            <div class="card-panel" style="text-align: center; padding: 2.5rem 1.5rem;">
-                <div style="font-size: 2.5rem; margin-bottom: 0.8rem; color: #6366f1; display: flex; justify-content: center;">
-                    <svg width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-                </div>
-                <div style="font-size: 1.1rem; font-weight: 700; color: #e2e8f0; margin-bottom: 0.4rem;">Ready for Analysis ({word_count} Words)</div>
-                <div style="font-size: 0.85rem; color: #94a3b8; max-width: 380px; margin: 0 auto;">Input requirement satisfied. Click <b>Analyze Text</b> on the left panel to run the Hybrid Detection Engine.</div>
+            with st.spinner("Generating XAI explanation...\nSHAP, LIME and Transformer Attention are being analyzed.\nThis may take approximately 1 minute."):
+                t_xai_start = time.time()
+                xai_out_dir = BASE_DIR / "reports" / "explainability" / "unified" / "interactive_session"
+                xai_out_dir.mkdir(parents=True, exist_ok=True)
+
+                cached_pred = st.session_state.get("last_analysis_results", {}).get("hybrid_res")
+                if xai_engine is not None and hybrid_pipeline is not None:
+                    if hasattr(xai_engine, "set_pipeline"):
+                        xai_engine.set_pipeline(hybrid_pipeline)
+                    else:
+                        xai_engine.pipeline = hybrid_pipeline
+
+                try:
+                    xai_res = xai_engine.explain(
+                        text_or_file=input_text,
+                        save_dir=xai_out_dir,
+                        sample_id="interactive",
+                        num_lime_samples=30,
+                        num_lime_features=5,
+                        prediction_result=cached_pred
+                    )
+                except Exception as xai_err:
+                    if "Feature shape mismatch" in str(xai_err) or "vectorizer" in str(xai_err).lower() or "28 vs. 30001" in str(xai_err):
+                        st.cache_resource.clear()
+                        hybrid_pipeline = get_hybrid_pipeline()
+                        xai_engine = get_xai_engine()
+                        if xai_engine is not None and hybrid_pipeline is not None:
+                            if hasattr(xai_engine, "set_pipeline"):
+                                xai_engine.set_pipeline(hybrid_pipeline)
+                            else:
+                                xai_engine.pipeline = hybrid_pipeline
+                        xai_res = xai_engine.explain(
+                            text_or_file=input_text,
+                            save_dir=xai_out_dir,
+                            sample_id="interactive",
+                            num_lime_samples=30,
+                            num_lime_features=5,
+                            prediction_result=cached_pred
+                        )
+                    else:
+                        raise xai_err
+
+                st.session_state["xai_result_cache"] = xai_res
+                st.session_state["xai_cache_text"] = input_text
+                has_cached_xai = True
+
+    if has_cached_xai and "xai_result_cache" in st.session_state:
+        xai_res = st.session_state["xai_result_cache"]
+
+        # Header Block
+        st.markdown("""
+        <div style="margin-top: 1.5rem; margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.8rem;">
+            <div style="color: #a78bfa; font-size: 1.15rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;">
+                EXPLAINABLE AI (XAI) INTERPRETABILITY DASHBOARD
             </div>
-            """, unsafe_allow_html=True)
+            <div style="color: #94a3b8; font-size: 0.88rem; margin-top: 4px;">
+                Multi-model evidence explaining the Hybrid Stacking Ensemble prediction.
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Action Button Directly Underneath Heading
+        xai_btn_col1, xai_btn_col2, xai_btn_col3 = st.columns([1, 2, 1])
+        with xai_btn_col2:
+            generate_xai_clicked = st.button(
+                "Generate Full XAI Explanation",
+                type="primary",
+                key="generate_xai_btn",
+                use_container_width=True
+            )
+
+        if generate_xai_clicked:
+            if xai_engine is None:
+                st.error("Unified Explainability Engine is offline or could not be loaded.")
+            else:
+                with st.spinner("Generating XAI explanation...\nSHAP, LIME and Transformer Attention are being analyzed.\nThis may take approximately 1 minute."):
+                    t_xai_start = time.time()
+                    xai_out_dir = BASE_DIR / "reports" / "explainability" / "unified" / "interactive_session"
+                    xai_out_dir.mkdir(parents=True, exist_ok=True)
+
+                    cached_pred = st.session_state.get("last_analysis_results", {}).get("hybrid_res")
+                    if xai_engine is not None and hybrid_pipeline is not None:
+                        if hasattr(xai_engine, "set_pipeline"):
+                            xai_engine.set_pipeline(hybrid_pipeline)
+                        else:
+                            xai_engine.pipeline = hybrid_pipeline
+
+                    try:
+                        xai_res = xai_engine.explain(
+                            text_or_file=input_text,
+                            save_dir=xai_out_dir,
+                            sample_id="interactive",
+                            num_lime_samples=30,
+                            num_lime_features=5,
+                            prediction_result=cached_pred
+                        )
+                    except Exception as xai_err:
+                        if "Feature shape mismatch" in str(xai_err) or "vectorizer" in str(xai_err).lower() or "28 vs. 30001" in str(xai_err):
+                            st.cache_resource.clear()
+                            hybrid_pipeline = get_hybrid_pipeline()
+                            xai_engine = get_xai_engine()
+                            if xai_engine is not None and hybrid_pipeline is not None:
+                                if hasattr(xai_engine, "set_pipeline"):
+                                    xai_engine.set_pipeline(hybrid_pipeline)
+                                else:
+                                    xai_engine.pipeline = hybrid_pipeline
+                            xai_res = xai_engine.explain(
+                                text_or_file=input_text,
+                                save_dir=xai_out_dir,
+                                sample_id="interactive",
+                                num_lime_samples=30,
+                                num_lime_features=5,
+                                prediction_result=cached_pred
+                            )
+                        else:
+                            raise xai_err
+
+                    st.session_state["xai_result_cache"] = xai_res
+                    st.session_state["xai_cache_text"] = input_text
+                    st.rerun()
+
+        # ── SINGLE-PAGE CONTINUOUS XAI DASHBOARD ───────────────────────────
+        exp_data = generate_dynamic_decision_explanation(xai_res)
+
+        cls_val = exp_data["class_val"]
+        conf_val = exp_data["confidence_val"]
+        p_ai_pct = exp_data["p_ai"] * 100.0
+        p_hu_pct = exp_data["p_human"] * 100.0
+        cls_color = "#f43f5e" if cls_val == "AI Generated" else "#10b981"
+
+        mb = xai_res.get("prediction", {}).get("model_breakdown", {})
+        r_p = mb.get('roberta', 0.0)
+        d_p = mb.get('deberta', 0.0)
+        b_p = mb.get('distilbert', 0.0)
+        x_p = mb.get('xgboost', 0.0)
+        agree_count = exp_data["agree_count"]
+
+        # 1. FINAL PREDICTION CARD (Full Container Width)
+        st.markdown(f"""
+        <div style="background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 20px 24px; margin-bottom: 20px;">
+            <div style="font-size: 0.78rem; color: #94a3b8; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">FINAL PREDICTION</div>
+            <div style="font-size: 1.9rem; font-weight: 800; color: {cls_color}; margin: 6px 0 14px 0;">
+                {cls_val}
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; border-top: 1px solid #1e293b; padding-top: 14px;">
+                <div>
+                    <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Confidence</div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: #f1f5f9;">{conf_val:.1f}%</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Decision Threshold</div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: #f1f5f9;">0.50</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">AI Probability</div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: #f43f5e;">{p_ai_pct:.1f}%</div>
+                </div>
+                <div>
+                    <div style="font-size: 0.75rem; color: #64748b; text-transform: uppercase;">Human Probability</div>
+                    <div style="font-size: 1.1rem; font-weight: 700; color: #10b981;">{p_hu_pct:.1f}%</div>
+                </div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # 2. DYNAMIC DECISION EXPLANATION
+        st.markdown(f"#### WHY THIS DOCUMENT WAS CLASSIFIED AS {cls_val.upper()}")
+        st.markdown(exp_data['dynamic_narrative'])
+
+        st.markdown("<hr style='border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 2rem 0 1.5rem;'>", unsafe_allow_html=True)
+
+        # 3. INTERACTIVE SHAP FEATURE ATTRIBUTION ARTIFACTS
+        st.markdown("### SHAP FEATURE ATTRIBUTION EVIDENCE")
+        st.caption("Top feature attributions explaining model logit weights. Positive SHAP pushes toward AI Generated, negative pushes toward Human Written.")
+        
+        if xai_res.get("shap", {}).get("status") == "PASS":
+            shap_data = xai_res["shap"]
+            meta_s = shap_data.get("meta_classifier", {})
+            xgb_s = shap_data.get("xgboost", {})
+
+            col_s1, col_s2 = st.columns(2, gap="medium")
+            with col_s1:
+                st.markdown("##### META-CLASSIFIER SHAP DRIVERS")
+                st.caption(f"Log-odds logit space | Base logit: `{meta_s.get('base_value', 0.0):.2f}`")
+                top_meta = sorted(meta_s.get("attributions", []), key=lambda x: x.get("importance", 0.0), reverse=True)[:5]
+                if top_meta:
+                    df_meta = pd.DataFrame([
+                        {
+                            "Feature": f.get("feature", "N/A"),
+                            "Category": f.get("category", "N/A"),
+                            "Value": f"{f['value']:.3f}" if isinstance(f.get("value"), float) else str(f.get("value", "")),
+                            "SHAP Weight": f"{float(f.get('shap_value', 0.0)):+.4f}",
+                            "Direction": str(f.get("direction", "")).replace("Pushes ", "")
+                        }
+                        for f in top_meta
+                    ])
+                    st.dataframe(df_meta, use_container_width=True, hide_index=True)
+
+                    top_meta_name = top_meta[0].get("feature", "features")
+                    top_meta_dir = str(top_meta[0].get("direction", "")).replace("Pushes ", "")
+                    st.markdown(f"<div style='font-size: 0.82rem; color: #94a3b8; margin-top: 6px;'><i>Interpretation: Strongest meta feature (`{top_meta_name}`) pushes toward <b>{top_meta_dir}</b>.</i></div>", unsafe_allow_html=True)
+
+                for p in xai_res.get("visualizations", {}).get("shap", []):
+                    if "meta_classifier" in str(p) and os.path.exists(p):
+                        st.markdown("<div style='margin-top: 12px;'>", unsafe_allow_html=True)
+                        st.image(str(p), caption="Top Meta-Classifier SHAP Feature Contributions", use_container_width=True)
+                        st.markdown("</div>", unsafe_allow_html=True)
+
+            with col_s2:
+                st.markdown("##### STYLOMETRIC (XGBOOST) TREESHAP DRIVERS")
+                st.caption(f"Log-odds margin space | Base margin: `{xgb_s.get('base_value', 0.0):.2f}`")
+                top_xgb = sorted(xgb_s.get("attributions", []), key=lambda x: x.get("importance", 0.0), reverse=True)[:5]
+                if top_xgb:
+                    df_xgb = pd.DataFrame([
+                        {
+                            "Feature": f.get("feature", "N/A"),
+                            "Category": f.get("category", "N/A"),
+                            "Value": f"{f['value']:.3f}" if isinstance(f.get("value"), float) else str(f.get("value", "")),
+                            "SHAP Weight": f"{float(f.get('shap_value', 0.0)):+.4f}",
+                            "Direction": str(f.get("direction", "")).replace("Pushes ", "")
+                        }
+                        for f in top_xgb
+                    ])
+                    st.dataframe(df_xgb, use_container_width=True, hide_index=True)
+
+                    top_xgb_name = top_xgb[0].get("feature", "features")
+                    top_xgb_dir = str(top_xgb[0].get("direction", "")).replace("Pushes ", "")
+                    st.markdown(f"<div style='font-size: 0.82rem; color: #94a3b8; margin-top: 6px;'><i>Interpretation: Strongest stylometric feature (`{top_xgb_name}`) favors <b>{top_xgb_dir}</b>.</i></div>", unsafe_allow_html=True)
+
+                for p in xai_res.get("visualizations", {}).get("shap", []):
+                    if "xgboost" in str(p) and os.path.exists(p):
+                        st.markdown("<div style='margin-top: 12px;'>", unsafe_allow_html=True)
+                        st.image(str(p), caption="Top XGBoost TreeSHAP Stylometric Contributions", use_container_width=True)
+                        st.markdown("</div>", unsafe_allow_html=True)
+        else:
+            st.warning(f"SHAP explanation unavailable: {xai_res.get('shap', {}).get('error', 'Disabled')}")
+
+        st.markdown("<hr style='border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 2rem 0 1.5rem;'>", unsafe_allow_html=True)
+
+        # 4. INTERACTIVE LIME WORD ATTRIBUTION ARTIFACTS
+        st.markdown("### LIME LOCAL WORD-LEVEL EVIDENCE")
+        if xai_res.get("lime", {}).get("status") == "PASS":
+            lime_data = xai_res["lime"]
+            st.caption(f"Local perturbation text attribution | Active explanation window: 500 words | Truncated: `{lime_data.get('is_truncated', False)}`")
+
+            col_l1, col_l2 = st.columns(2, gap="medium")
+            pos_words = lime_data.get("positive_words", [])[:5]
+            neg_words = lime_data.get("negative_words", [])[:5]
+
+            with col_l1:
+                st.markdown("##### TOP AI-SUPPORTING WORDS")
+                if pos_words:
+                    df_pos = pd.DataFrame([{"Word": w.get("word", ""), "LIME Weight": f"{float(w.get('weight', 0.0)):+.4f}", "Direction": w.get("direction", "")} for w in pos_words])
+                    st.dataframe(df_pos, use_container_width=True, hide_index=True)
+                else:
+                    st.info("No positive AI-directed LIME words identified.")
+
+            with col_l2:
+                st.markdown("##### TOP HUMAN-SUPPORTING WORDS")
+                if neg_words:
+                    df_neg = pd.DataFrame([{"Word": w.get("word", ""), "LIME Weight": f"{float(w.get('weight', 0.0)):+.4f}", "Direction": w.get("direction", "")} for w in neg_words])
+                    st.dataframe(df_neg, use_container_width=True, hide_index=True)
+                else:
+                    st.info("No negative Human-directed LIME words identified.")
+
+            st.markdown("##### LIME WORD ATTRIBUTION VISUALIZATION")
+            for p in xai_res.get("visualizations", {}).get("lime", []):
+                if p.endswith(".png") and os.path.exists(p) and "highlight" not in str(p):
+                    st.image(str(p), caption="LIME Top Word Attribution Chart", use_container_width=True)
+
+            st.markdown("##### HIGHLIGHTED TEXT")
+            st.caption("Words highlighted in red indicate positive LIME weights (pushing AI). Words in blue indicate negative weights (pushing Human). Active explanation window: 500 words.")
+            html_highlight = lime_data.get("html_highlight", "")
+            if html_highlight:
+                st.markdown(f"""
+                <div style="background: #0b1120; border: 1px solid #1e293b; border-radius: 8px; padding: 14px 18px; margin: 0.8rem 0; font-family: monospace; font-size: 0.88rem; line-height: 1.7; max-height: 280px; overflow-y: auto;">
+                    {html_highlight}
+                </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.warning(f"LIME explanation unavailable: {xai_res.get('lime', {}).get('error', 'Disabled')}")
+
+        st.markdown("<hr style='border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 2rem 0 1.5rem;'>", unsafe_allow_html=True)
+
+        # 5. TRANSFORMER ATTENTION EVIDENCE
+        st.markdown("### TRANSFORMER ATTENTION EVIDENCE")
+        if xai_res.get("attention", {}).get("status") == "PASS":
+            attn_data = xai_res["attention"]
+            st.caption("Active attention window: 512 tokens | Head-averaging aggregation | Punctuation and special tokens filtered")
+
+            attn_model_tab1, attn_model_tab2, attn_model_tab3, attn_model_tab4 = st.tabs([
+                "RoBERTa V2.1",
+                "DeBERTa-v3 V2.1",
+                "DistilBERT V2.1",
+                "Cross-Model Comparison"
+            ])
+
+            with attn_model_tab1:
+                st.markdown("##### RoBERTa V2.1 (Top Meaningful Tokens)")
+                r_toks = attn_data.get("roberta", {}).get("top_attended_tokens", [])[:8]
+                if r_toks:
+                    st.dataframe(pd.DataFrame([{"Token": t.get("clean_token", ""), "Attention Score": t.get("importance_score", 0.0)} for t in r_toks]), use_container_width=True, hide_index=True)
+
+                for p in xai_res.get("visualizations", {}).get("attention", []):
+                    if "roberta" in str(p) and os.path.exists(p):
+                        cap = "RoBERTa V2.1 token-to-token attention heatmap (10x10 matrix)" if "heatmap" in str(p) else "RoBERTa V2.1 top meaningful token attention"
+                        st.image(str(p), caption=cap, use_container_width=True)
+
+            with attn_model_tab2:
+                st.markdown("##### DeBERTa-v3 V2.1 (Top Meaningful Tokens)")
+                d_toks = attn_data.get("deberta", {}).get("top_attended_tokens", [])[:8]
+                if d_toks:
+                    st.dataframe(pd.DataFrame([{"Token": t.get("clean_token", ""), "Attention Score": t.get("importance_score", 0.0)} for t in d_toks]), use_container_width=True, hide_index=True)
+
+                for p in xai_res.get("visualizations", {}).get("attention", []):
+                    if "deberta" in str(p) and os.path.exists(p):
+                        cap = "DeBERTa-v3 V2.1 token-to-token attention heatmap (10x10 matrix)" if "heatmap" in str(p) else "DeBERTa-v3 V2.1 top meaningful token attention"
+                        st.image(str(p), caption=cap, use_container_width=True)
+
+            with attn_model_tab3:
+                st.markdown("##### DistilBERT V2.1 (Top Meaningful Tokens)")
+                b_toks = attn_data.get("distilbert", {}).get("top_attended_tokens", [])[:8]
+                if b_toks:
+                    st.dataframe(pd.DataFrame([{"Token": t.get("clean_token", ""), "Attention Score": t.get("importance_score", 0.0)} for t in b_toks]), use_container_width=True, hide_index=True)
+
+                for p in xai_res.get("visualizations", {}).get("attention", []):
+                    if "distilbert" in str(p) and os.path.exists(p):
+                        cap = "DistilBERT V2.1 token-to-token attention heatmap (10x10 matrix)" if "heatmap" in str(p) else "DistilBERT V2.1 aggregated token attention"
+                        st.image(str(p), caption=cap, use_container_width=True)
+
+            with attn_model_tab4:
+                st.markdown("##### CROSS-MODEL ATTENTION PATTERN COMPARISON")
+                st.markdown("<div style='font-size: 0.88rem; color: #cbd5e1; margin-bottom: 10px;'>Across the three transformer models, self-attention is concentrated on content-bearing lexical tokens rather than punctuation. The models show complementary focal patterns within the active 512-token window.</div>", unsafe_allow_html=True)
+                for p in xai_res.get("visualizations", {}).get("attention", []):
+                    if "cross_model" in str(p) and os.path.exists(p):
+                        st.image(str(p), caption="Cross-Model Attention Allocation Comparison", use_container_width=True)
+
+            st.markdown("<hr style='border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 1rem 0 0.8rem;'>", unsafe_allow_html=True)
+            st.markdown(
+                "<div style='font-size: 0.8rem; color: #64748b; font-style: italic;'>"
+                "Note: Attention weights indicate internal token-to-token routing and structural focus under the selected aggregation strategy, "
+                "and should be interpreted as structural interpretability signals rather than causal proof of the classification."
+                "</div>",
+                unsafe_allow_html=True
+            )
+        else:
+            st.warning(f"Attention visualization unavailable: {xai_res.get('attention', {}).get('error', 'Disabled')}")
+
+        st.markdown("<hr style='border: none; border-top: 1px solid rgba(255,255,255,0.08); margin: 2rem 0 1.5rem;'>", unsafe_allow_html=True)
+
+        # 6. RESEARCH-GRADE METHODOLOGICAL DISCLAIMERS & RUNTIME
+        st.markdown("""
+        <div style="background: #0b1120; border: 1px solid #1e293b; border-radius: 6px; padding: 14px 18px; font-size: 0.78rem; color: #94a3b8; line-height: 1.6;">
+            <strong>RESEARCH METHODOLOGY & INTERPRETABILITY DISCLAIMERS:</strong><br>
+            • <strong>Confidence vs Explanation:</strong> Model confidence represents logit calibration strength in output probability space, not mathematical reliability of individual attributions.<br>
+            • <strong>SHAP Attributions:</strong> Feature attributions represent marginal log-odds contributions under 5-fold Meta-Classifier cross-validation and TreeSHAP margin space.<br>
+            • <strong>LIME Perturbations:</strong> Local word-level attributions are computed via local linear perturbation modeling over an active 500-word window.<br>
+            • <strong>Transformer Attention:</strong> Attention maps describe self-attention routing matrices under final-layer head-averaging aggregation and do not serve as causal proof of classification.
+        </div>
+        """, unsafe_allow_html=True)
+
+        rt = xai_res.get("runtime", {})
+        total_sec = float(rt.get('total_ms', 0.0)) / 1000.0
+        st.markdown(
+            f"<div style='font-size: 0.80rem; color: #64748b; font-style: italic; text-align: right; margin-top: 10px; margin-bottom: 20px;'>"
+            f"Explanation generated in <b>{total_sec:.1f} seconds</b>."
+            f"</div>",
+            unsafe_allow_html=True
+        )
+
 
 # Footer
 st.markdown("""
 <div class="app-footer">
-    <strong>Hybrid AI Text Detector</strong> &bull; Multi-Model Ensemble Detection & Stylometric System<br>
-    RoBERTa &bull; DeBERTa &bull; DistilBERT &bull; XGBoost &bull; Stacking Meta-Classifier
+    <strong>Hybrid AI Text Detector & XAI Dashboard</strong> &bull; Multi-Model Ensemble Detection & Explainable AI Framework<br>
+    RoBERTa &bull; DeBERTa &bull; DistilBERT &bull; XGBoost &bull; Stacking Meta-Classifier &bull; SHAP &bull; LIME &bull; Attention
 </div>
 """, unsafe_allow_html=True)
-
