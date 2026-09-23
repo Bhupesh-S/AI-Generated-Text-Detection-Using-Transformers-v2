@@ -154,16 +154,62 @@ class HybridInferencePipeline:
         if not CFG.xgboost_path.exists():
             raise FileNotFoundError(f"XGBoost model path does not exist: {CFG.xgboost_path}")
 
-        # Load TF-IDF Vectorizer & XGBoost
-        logger.info(f"Loading TF-IDF Vectorizer: {CFG.vectorizer_path}")
-        self.vectorizer = joblib.load(str(CFG.vectorizer_path))
+        # Resolve & Validate V3 TF-IDF Vectorizer Path
+        vec_path = Path(CFG.vectorizer_path)
+        if not vec_path.exists():
+            fallback_vec = _REPO_ROOT / "outputs" / "retraining_v3" / "xgboost" / "vectorizer" / "tfidf_vectorizer.joblib"
+            if fallback_vec.exists():
+                vec_path = fallback_vec
+            else:
+                raise FileNotFoundError(
+                    f"Failed to load V3 XGBoost TF-IDF vectorizer: File not found at {vec_path}"
+                )
+
+        # Load & Validate V3 TF-IDF Vectorizer
+        logger.info(f"Loading TF-IDF Vectorizer: {vec_path}")
+        try:
+            self.vectorizer_xgboost = joblib.load(str(vec_path))
+            self.vectorizer = self.vectorizer_xgboost
+        except Exception as e:
+            raise RuntimeError(f"Failed to load V3 XGBoost TF-IDF vectorizer from {vec_path}: {e}")
+
+        if self.vectorizer_xgboost is None:
+            raise RuntimeError(
+                f"Failed to load V3 XGBoost TF-IDF vectorizer: Object is None after loading {vec_path}"
+            )
+
+        # Verify vectorizer vocabulary dimensionality
+        vec_features = len(getattr(self.vectorizer_xgboost, "vocabulary_", {}))
+        if vec_features != 30000:
+            logger.warning(
+                f"V3 TF-IDF Vectorizer vocabulary count is {vec_features}, expected 30,000."
+            )
+
+        # Load & Validate XGBoost Model
         logger.info(f"Loading XGBoost model: {CFG.xgboost_path}")
-        self.model_xgboost = joblib.load(str(CFG.xgboost_path))
+        try:
+            self.model_xgboost = joblib.load(str(CFG.xgboost_path))
+        except Exception as e:
+            raise RuntimeError(f"Failed to load V3 XGBoost model from {CFG.xgboost_path}: {e}")
 
         if hasattr(self.model_xgboost, "classes_"):
             xgb_classes = list(self.model_xgboost.classes_)
             if xgb_classes != [0, 1]:
                 raise ValueError(f"Incompatible XGBoost classes_: {xgb_classes}. Expected [0, 1].")
+
+        # Verify XGBoost expected feature count against vectorizer
+        xgb_expected = getattr(self.model_xgboost, "n_features_in_", None)
+        if xgb_expected is None and hasattr(self.model_xgboost, "get_booster"):
+            try:
+                xgb_expected = self.model_xgboost.get_booster().num_features()
+            except Exception:
+                xgb_expected = 30000
+        if xgb_expected is not None and xgb_expected != vec_features:
+            raise ValueError(
+                f"Feature dimension mismatch between vectorizer and XGBoost model:\n"
+                f"  - Vectorizer feature count: {vec_features} ({vec_path})\n"
+                f"  - XGBoost expected feature count: {xgb_expected} ({CFG.xgboost_path})"
+            )
 
         # Load Transformers
         def load_tok(local_path, base_name):
@@ -323,12 +369,72 @@ Models:
         probs = softmax(logits, axis=-1)[0]  # shape (2,) [P(Human), P(AI)]
         return probs
 
+    def _get_vectorizer_xgboost(self):
+        """
+        Retrieve or lazy-load the V3 TF-IDF vectorizer.
+        Guarantees that cached pipeline instances (e.g. across Streamlit sessions)
+        always have access to the initialized 30,000-feature vectorizer.
+        """
+        if getattr(self, "vectorizer_xgboost", None) is not None:
+            return self.vectorizer_xgboost
+        if getattr(self, "vectorizer", None) is not None:
+            self.vectorizer_xgboost = self.vectorizer
+            return self.vectorizer_xgboost
+
+        # Lazy-loading fallback for cached sessions
+        vec_candidates = [
+            getattr(CFG, "vectorizer_path", None),
+            _REPO_ROOT / "outputs" / "retraining_v3" / "xgboost" / "vectorizer" / "tfidf_vectorizer.joblib",
+            Path(r"C:\7th Sem\Paper\-AI-Generated-Text-Detection-Using-Transformers_CODE\outputs\retraining_v3\xgboost\vectorizer\tfidf_vectorizer.joblib"),
+        ]
+        for p in vec_candidates:
+            if p is not None and Path(p).exists():
+                try:
+                    logger.info(f"Lazy-loading V3 XGBoost TF-IDF vectorizer from: {p}")
+                    vec = joblib.load(str(p))
+                    self.vectorizer_xgboost = vec
+                    self.vectorizer = vec
+                    return self.vectorizer_xgboost
+                except Exception as e:
+                    logger.error(f"Failed to lazy-load V3 XGBoost TF-IDF vectorizer from {p}: {e}")
+
+        expected_p = getattr(
+            CFG,
+            "vectorizer_path",
+            r"C:\7th Sem\Paper\-AI-Generated-Text-Detection-Using-Transformers_CODE\outputs\retraining_v3\xgboost\vectorizer\tfidf_vectorizer.joblib"
+        )
+        raise RuntimeError(
+            f"Failed to load V3 XGBoost TF-IDF vectorizer. Expected path: {expected_p}"
+        )
+
     def _predict_xgboost(self, text: str) -> np.ndarray:
-        from feature_engineering.utils import extract_features
-        import pandas as pd
-        feat_dict = extract_features(text)
-        feat_df = pd.DataFrame([feat_dict])
-        raw_probs = self.model_xgboost.predict_proba(feat_df)[0]  # [P(Human), P(AI)]
+        cleaned_text = str(text).strip() if text else ""
+        vec = self._get_vectorizer_xgboost()
+
+        tfidf_features = vec.transform([cleaned_text])
+
+        # Programmatic verification of feature dimensionality
+        expected_features = getattr(self.model_xgboost, "n_features_in_", None)
+        if expected_features is None and hasattr(self.model_xgboost, "get_booster"):
+            try:
+                expected_features = self.model_xgboost.get_booster().num_features()
+            except Exception:
+                expected_features = 30000
+        if expected_features is None:
+            expected_features = 30000
+
+        if tfidf_features.shape[1] != expected_features:
+            vec_path = getattr(CFG, "vectorizer_path", "unknown")
+            xgb_path = getattr(CFG, "xgboost_path", "unknown")
+            raise ValueError(
+                f"Feature shape mismatch:\n"
+                f"  - vectorizer feature count: {tfidf_features.shape[1]}\n"
+                f"  - XGBoost expected feature count: {expected_features}\n"
+                f"  - vectorizer path: {vec_path}\n"
+                f"  - XGBoost model path: {xgb_path}"
+            )
+
+        raw_probs = self.model_xgboost.predict_proba(tfidf_features)[0]  # [P(Human), P(AI)]
 
         if self.platt_calibrator_xgb is not None:
             cal_probs = self.platt_calibrator_xgb.predict_proba(raw_probs.reshape(1, -1))[0]
@@ -396,6 +502,13 @@ Models:
         prediction = self.ID2LABEL[pred_id]
         confidence = float(max(ai_prob, human_prob))
 
+        # Retrieve detailed diagnostics if available
+        meta_diagnostics = {}
+        if hasattr(self.meta_model, "get_diagnostics"):
+            meta_diagnostics = self.meta_model.get_diagnostics(dict_probs_2d, [text])
+            if meta_diagnostics.get("consensus_conflict"):
+                logger.warning("Base-model consensus conflict: 4/4 base models predict AI while meta-classifier predicts Human.")
+
         # 4. Diagnostic Consensus Calculation
         base_models = ["roberta", "deberta", "distilbert", "xgboost"]
         ai_votes = sum(1 for m in base_models if probs[m][1] >= 0.50)
@@ -451,6 +564,8 @@ Models:
                 "ai_probability": ai_prob,
                 "human_probability": human_prob
             },
+
+            "meta_classifier_diagnostics": meta_diagnostics,
 
             # Backwards compatibility fields
             "base_probs": {m: probs[m] for m in probs},

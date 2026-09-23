@@ -87,11 +87,19 @@ def prepare_stacking_features(probs: Dict[str, np.ndarray], texts: List[str] = N
             hc_features = extract_features_batch(texts)
             hc_array = np.zeros((n_samples, 5))
             for i, f in enumerate(hc_features):
-                hc_array[i, 0] = float(f.get("char_count", 0)) / 1000.0  # Normalized length
-                hc_array[i, 1] = float(f.get("sentence_count", 0)) / 10.0 # Normalized sentence count
-                hc_array[i, 2] = float(f.get("avg_sentence_length", 0)) / 20.0
-                hc_array[i, 3] = float(f.get("ttr", 0))
-                hc_array[i, 4] = float(f.get("sentence_length_burstiness", 0))
+                # Clamp structural length features to upper bound [0.0, 3.5]
+                # to prevent linear feature explosion on long documents
+                char_count = f.get("char_count", 0)
+                sent_count = f.get("sentence_count", f.get("sent_count", 0))
+                avg_sent_len = f.get("avg_sentence_length", f.get("avg_sent_len", 0))
+                ttr = f.get("ttr", 0)
+                burstiness = f.get("sentence_length_burstiness", f.get("burstiness", 0))
+
+                hc_array[i, 0] = float(np.clip(char_count / 1000.0, 0.0, 3.5))       # 13: norm_char_count
+                hc_array[i, 1] = float(np.clip(sent_count / 10.0, 0.0, 3.5))        # 14: norm_sent_count
+                hc_array[i, 2] = float(np.clip(avg_sent_len / 20.0, 0.0, 3.5))      # 15: norm_avg_sent_len
+                hc_array[i, 3] = float(ttr)                                          # 16: ttr
+                hc_array[i, 4] = float(burstiness)                                   # 17: burstiness
             features.append(hc_array)
         except Exception as e:
             logger.warning(f"Failed to extract document meta-features during stacking: {e}. Filling with zeros.")
@@ -182,7 +190,7 @@ class StackingEnsembleMetaClassifier:
         return float(best_threshold)
 
     def predict_proba(self, probs: Dict[str, np.ndarray], texts: List[str] = None) -> np.ndarray:
-        """Averages prediction probabilities of all K-Fold models."""
+        """Averages prediction probabilities of all K-Fold models cleanly without hard overrides."""
         X_meta = prepare_stacking_features(probs, texts)
         fold_probs = []
         for model in self.models:
@@ -192,6 +200,44 @@ class StackingEnsembleMetaClassifier:
     def predict(self, probs: Dict[str, np.ndarray], texts: List[str] = None) -> np.ndarray:
         final_probs = self.predict_proba(probs, texts)
         return (final_probs[:, 1] >= self.best_threshold).astype(int)
+
+    def get_diagnostics(self, probs: Dict[str, np.ndarray], texts: List[str] = None) -> Dict:
+        """
+        Generate detailed diagnostic information for the Stacking Meta-Classifier.
+        Does NOT override the learned model prediction.
+        """
+        X_meta = prepare_stacking_features(probs, texts)
+        fold_probs = [float(model.predict_proba(X_meta)[0, 1]) for model in self.models]
+        final_ai_prob = float(np.mean(fold_probs))
+        final_human_prob = 1.0 - final_ai_prob
+
+        raw_features = X_meta[0].tolist()
+        clipped_length_features = [float(X_meta[0, 13]), float(X_meta[0, 14]), float(X_meta[0, 15])]
+
+        agreement_count = int(X_meta[0, 11])
+        prob_mean = float(X_meta[0, 4])
+        unanimous_base_ai = (agreement_count == 4 and prob_mean >= 0.50)
+
+        decision = "AI Generated" if final_ai_prob >= self.best_threshold else "Human Written"
+        consensus_conflict = bool(unanimous_base_ai and decision == "Human Written")
+
+        conflict_warning = None
+        if consensus_conflict:
+            conflict_warning = "Base-model consensus conflict: 4/4 base models predict AI while meta-classifier predicts Human."
+            logger.warning(conflict_warning)
+
+        return {
+            "raw_features": raw_features,
+            "clipped_length_features": clipped_length_features,
+            "fold_probabilities": fold_probs,
+            "final_ai_probability": final_ai_prob,
+            "final_human_probability": final_human_prob,
+            "best_threshold": float(self.best_threshold),
+            "final_decision": decision,
+            "unanimous_base_ai": unanimous_base_ai,
+            "consensus_conflict": consensus_conflict,
+            "conflict_warning": conflict_warning
+        }
 
 
 def train_meta_classifier(

@@ -19,11 +19,11 @@ class EnsembleConfig:
     """All configuration parameters for the Ensemble model."""
 
     # ── Model Paths ──────────────────────────────────────────────────────────
-    roberta_path: Path = PROJECT_ROOT / "outputs" / "retraining_v2_1" / "roberta"
-    deberta_path: Path = PROJECT_ROOT / "outputs" / "retraining_v2_1" / "deberta" / "final"
-    distilbert_path: Path = PROJECT_ROOT / "outputs" / "retraining_v2_1" / "distilbert" / "final"
-    xgboost_path: Path = PROJECT_ROOT / "outputs" / "models" / "xgboost.joblib"
-    vectorizer_path: Path = PROJECT_ROOT / "outputs" / "tfidf" / "tfidf_vectorizer.pkl"
+    roberta_path: Path = PROJECT_ROOT / "outputs" / "retraining_v3" / "roberta" / "final"
+    deberta_path: Path = PROJECT_ROOT / "outputs" / "retraining_v3" / "deberta" / "final"
+    distilbert_path: Path = PROJECT_ROOT / "outputs" / "retraining_v3" / "distilbert" / "final"
+    xgboost_path: Path = PROJECT_ROOT / "outputs" / "retraining_v3" / "xgboost" / "final" / "xgboost_model.joblib"
+    vectorizer_path: Path = PROJECT_ROOT / "outputs" / "retraining_v3" / "xgboost" / "vectorizer" / "tfidf_vectorizer.joblib"
 
     # ── Data ─────────────────────────────────────────────────────────────────
     data_path: Path = PROJECT_ROOT / "Datasets" / "merged" / "final_dataset.csv"
