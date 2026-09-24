@@ -1,14 +1,14 @@
 # ============================================================
 #  Hybrid AI Text Detector - Git Ignore Specification
 # ============================================================
-.git_old_backup/
-# ── Virtual environments ─────────────────────────────────────
+
+# ── Virtual environments ────────────────────────────────────
 .venv/
 venv/
 ENV/
 env/
 
-# ── Python cache & build artifacts ───────────────────────────
+# ── Python cache & build artifacts ──────────────────────────
 __pycache__/
 *.py[cod]
 *$py.class
@@ -30,11 +30,11 @@ wheels/
 .installed.cfg
 *.egg
 
-# ── Secrets & Environment files ──────────────────────────────
+# ── Secrets & Environment files ─────────────────────────────
 .env
 .env.*
 
-# ── IDE & Editor configuration ───────────────────────────────
+# ── IDE & Editor configuration ──────────────────────────────
 .vscode/
 .idea/
 .ipynb_checkpoints/
@@ -42,39 +42,77 @@ wheels/
 *.swo
 *~
 
-# ── Operating System files ───────────────────────────────────
+# ── Operating System files ──────────────────────────────────
 .DS_Store
 Thumbs.db
 
-# ── Logs & Debugging ─────────────────────────────────────────
+# ── Logs & Debugging ────────────────────────────────────────
 logs/
 *.log
 
-# ── Reports & Generated PDFs ──────────────────────────────────
+# ── Documents, Manuscripts & Reports ────────────────────────
+*.md
+*.markdown
+*.doc
+*.docx
+*.docm
+*.rtf
 *.pdf
+!README.md
 
-# ── Large Model Files & Weights ───────────────────────────────
+# ── Backup & Corrupted files ────────────────────────────────
+*.bak
+*.corrupted_bak
+*.meta_bak
+.git_old_backup/
+
+# ── Temporary scratch files & scripts ───────────────────────
+temp.py
+scratch_audit.py
+fix.py
+b64.txt
+output.md
+scratch/
+tmp_profile/
+
+# ── Datasets ────────────────────────────────────────────────
+Datasets/
+datasets/
+
+# ── Large Model Weights (Exceed GitHub 100MB Limit) ─────────
 *.pt
 *.pth
 *.bin
 *.safetensors
 *.ckpt
 
-# ── Training Checkpoints & Profiling ──────────────────────────
-outputs/*/checkpoints/
-outputs/retraining_v2_1/*/checkpoint-*/
-outputs/**/checkpoint-*/
-tmp_profile/
-scratch/
-
-# ── Datasets ─────────────────────────────────────────────────
-Datasets/
-
-# ── Generated Dataset & Feature Artifacts ─────────────────────
+# ── Training/Split Artifacts & Intermediate Checkpoints ─────
 outputs/v2_1_splits/
+outputs/v3_splits/
+outputs/test_phase8641_save/
 outputs/handcrafted/
 outputs/labels/
-models/feature_engineering/
-
-# ── Large TF-IDF Artifacts ────────────────────────────────────
 outputs/tfidf/*.npz
+outputs/retraining_v2/test_run_fp32/
+outputs/generalization_phase1/
+outputs/phase2_acquisition/
+outputs/phase2_evaluation/
+outputs/phase3_evidence/
+outputs/phase3_manuscript/
+outputs/phase3c_model_improvement/
+**/checkpoint-*/
+checkpoint-*/
+models/feature_engineering/
+reports/
+
+# ── Training/Kaggle Scripts Not Required by app.py ──────────
+balance_and_split_v3.py
+create_v3_splits.py
+generate_manuscript.py
+outputs/kaggle_notebooks/kaggle_*_v3*.py
+
+# ── Model Checkpoints (Allow specific runtime models) ───────
+outputs/*/checkpoints/
+!outputs/ensemble/checkpoints/
+!outputs/ensemble/checkpoints/*.joblib
+!outputs/ensemble/checkpoints/*.json
